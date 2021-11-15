@@ -1,8 +1,9 @@
 #pragma once
 #include <queue>
 #include "../../Utils.h"
+#include "../../Listener.h"
 
-class Input {
+class Input : public Listener {
 public:
 	static void Init();
 	static void ParseInput();

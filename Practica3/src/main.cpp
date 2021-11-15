@@ -8,101 +8,108 @@
 #include <stdio.h>
 
 const int nameSize = 16;
+const unsigned int baseTileSize = 20;
+float scale = 2.0f;
 
-int** vecMaps = nullptr;//64x64 informacion del mapa
-char* vecNamesMaps = nullptr;//nombre de cada mapa
-int* playerStart = nullptr;//2 x 1, posicion del jugador y su orientacion
+uint16_t** vecMaps = nullptr;//64x64 informacion del mapa
+char** vecNamesMaps = nullptr;//nombre de cada mapa
+uint16_t** playerStart = nullptr;//3 x 1, posicion (x,y)del jugador y su orientacion
+uint16_t numMaps = 0;
 
-float toRad(float deg) {
-	return (deg * 3.14) / 180;
-}
-
+//TODO liberar memoria
 void lecturaMapa(const char* fileName) {
 	bool bigEndian = Platform::IsBigEndian();
 
-	FILE* file = Platform::OpenFile(fileName, "r");
-
+	FILE* file = Platform::OpenFile(fileName, "rb");
+	//std::ifstream* file;
 	if (file == nullptr) return; // Ha fallado la carga
 
-	uint16_t tile, player, numMaps;
+	uint16_t tile = 0, player = 0;// , numMaps = 0;
 	
 	//numero de mapas
 	if (fread(&numMaps, 2, 1, file) == 0) return;
 	if (bigEndian)
 		numMaps = FLIPENDIAN_16((int)numMaps);
-	vecMaps = new int* [numMaps];
-	vecNamesMaps = new char[numMaps];
-	playerStart = new int[2];//posicion y orientacion del player
+	vecMaps = new uint16_t * [numMaps];
+	vecNamesMaps = new char* [numMaps];
+	playerStart = new uint16_t*[numMaps];//posicion y orientacion del player en cada mapa
 
 	for (int x = 0; x < numMaps && !feof(file); ++x) {
 		//nombre del mapa
-		char name[nameSize];
-		if (fread(&name, 16, 1, file) == 0) return;
-		vecNamesMaps[x] = *name;
+		
+		//char name[nameSize];
+		//for (int y = 0; y < nameSize; ++y) {
+			//char tmp;
+		vecNamesMaps[x] = new char[nameSize];
+		if (fread(vecNamesMaps[x], 16, 1, file) == 0) return;
+			//name[y] = tmp;
+		//}
+		//std::st
+		//vecNamesMaps[x] = name;  
+		std::cout << vecNamesMaps[x] << std::endl;
 
 		//el mapa como tal, 2 planos de 64*64 el primero con informaicon del nivel
 		// un tile con valor i se pinta en 2*i -1
 		//el segundo con la informacion del player, solo quedarse con el valor entre 19 y 22 inclusives
 		//19 player mira norte, 20 este, 21, sur, 22 oeste
 
-		vecMaps[x] = new int[ 64 * 64];
+		vecMaps[x] = new uint16_t[ 64 * 64];
 		//primer plano, informacion del nivel (paredes)
 		for (int y = 0; y < 64 * 64 ; ++y) {
-			if (fread(&tile, 2, 1, file) == 0) break;
+			if (fread(&tile, sizeof(uint16_t), 1, file) == 0) break;
 			if (bigEndian) tile = FLIPENDIAN_16(tile);
-			vecMaps[x][y] = tile;
-			if (tile <= 63 && tile >0) {
-				//std::cout << "tile " << tile << std::endl;
-
-			}
-			else
-				std::cout << "tile " << tile << std::endl;
+			vecMaps[x][y] = tile;		
 
 		}
+
+		playerStart[x] = new uint16_t[2];
+
 		//segundo plano, informacion del jugador (posicion inicial y donde mira)
 		for (int y = 0; y < 64 * 64 ; ++y) {
-			if (fread(&player, 2, 1, file) == 0) break;
+			if (fread(&player, sizeof(uint16_t), 1, file) == 0)
+				break;
 			if (bigEndian) player = FLIPENDIAN_16(player);
 			if (player >= 19 && player <= 22) {
-				playerStart[0] = y;
-				playerStart[1] = player;
-				break;
+				playerStart[x][0] = y ;
+				//playerStart[x][1] = y / 64;
+				playerStart[x][1] = player;
 			}
-			else
-				std::cout << "player " << player << std::endl;
-
 		}
-		std::cout << "player " << player << std::endl;
 
 	}
 }
 
+float toRad(float deg) {
+	return (deg * 3.14) / 180;
+}
+void drawMap(char* nameMap) {
+	int i = 0;
+	//buscar que mapa es
+	for (; i < numMaps; ++i) {
+		if (std::strcmp(vecNamesMaps[i], nameMap) == 0)
+			break;
+		std::cout << vecNamesMaps[i] << std::endl;
+	}
+
+	if (i > numMaps)
+		//mapa no encontrado
+		return;
+	int posPlayer = playerStart[i][0];
+	int finalTileSize = baseTileSize * scale;
+	for (int j = 0; j < 64 * 64; ++j) {
+		if (vecMaps[i][j] <= 63 && vecMaps[i][j] > 0) {
+			//std::cout << "tile " << tile << std::endl;
+			Renderer::DrawImage(*Renderer::GetImage(2*vecMaps[i][j] -2), ((j % 64) - (posPlayer % 64) ) * finalTileSize + Renderer::GetWidth() / 2,
+				((j / 64) - (posPlayer / 64) ) * finalTileSize + Renderer::GetHeight() / 2, finalTileSize, finalTileSize);
+		}
+	}
+}
+
 void draw() {
-	// GRID
-	/*int horizontal = gridOffset;
-	while (horizontal < Renderer::GetWidth()) {
-		Renderer::DrawLine(horizontal , 0, horizontal , Renderer::GetHeight(), { 255, 255, 255, 255 });
-		horizontal += offsets[gridInd];
-	}
-
-	int vertical = gridOffset;
-	while (vertical < Renderer::GetHeight()) {
-		Renderer::DrawLine(0, vertical , Renderer::GetWidth(), vertical , { 255, 255, 255, 255 });
-		vertical += offsets[gridInd];
-	}
-
-	// CIRCLE
-	int rad = Renderer::GetHeight() * 2 / 6;
-	Renderer::DrawCircle(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, rad, { 255, 255, 255, 255 });
 	
-	// SQUARE LINE
-	int contactX = Renderer::GetWidth() / 2 + cos(toRad(boxAngle)) * rad; int contactY = Renderer::GetHeight() / 2 + sin(toRad(boxAngle)) * rad;
-	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
 
-	// SQUARE
-	Renderer::DrawRect(contactX - squareSize / 2, contactY - squareSize / 2, squareSize, squareSize, colors[ind]);*/
-
-	Renderer::DrawImage(*Renderer::GetImage(0), 0, 0, 200, 100);
+	//Renderer::DrawImage(*Renderer::GetImage(0), 0, 0, 100, 100);
+	drawMap("Wolf1 Map1");
 }
 
 // Cambia los valores de la logica, para mover el grid, el angulo de la linea y el color del cuadrado
@@ -110,24 +117,13 @@ void updateLogic() {
 	
 }
 
-/*
-	handleinput(){
-	Input::parseInput
-	poll(){
-	if(MoveX)
-		movement *= -1;
-	
-	}
-	if(Evt.Exit)
-		exit = true;
-*/
 int main(int argc, char* argv[])
 {
 	//std::ofstream results; std::string fileDesc = "1280x720NoVSYNC";
 	//results.open("results" + fileDesc + ".txt", std::ios::trunc);	
 
 	Platform::Init();
-	Renderer::Init(false, 1280, 720);
+	Renderer::Init(false, 1920, 1080);
 	
 	//int cFrames = 0;
 	//auto start = std::chrono::high_resolution_clock::now();
