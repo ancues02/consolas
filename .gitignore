@@ -1,32 +1,58 @@
-# Prerequisites
-*.d
+# # Prerequisites
+# *.d
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# # Compiled Object files
+# *.slo
+# *.lo
+# *.o
+# *.obj
 
-# Precompiled Headers
-*.gch
-*.pch
+# # Precompiled Headers
+# *.gch
+# *.pch
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# # Compiled Dynamic libraries
+# *.so
+# *.dylib
+# *.dll
 
-# Fortran module files
-*.mod
-*.smod
+# # Fortran module files
+# *.mod
+# *.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# # Compiled Static libraries
+# *.lai
+# *.la
+# *.a
+# *.lib
 
-# Executables
-*.exe
-*.out
-*.app
+# # Executables
+# *.exe
+# *.out
+# *.app
+
+# *!/dependencies
+
+# */PS4
+
+*/dependencies
+*/exes
+*/projects
+*.sln
+*InputPS4.cpp
+*InputPS4.h
+*PlatformPS4.cpp
+*PlatformPS4.h
+*PlatformPS4.cpp
+*ASanUtils.h
+*UserMalloc.cpp
+*VideoMemory.cpp
+*VideoMemory.h
+*RenderBuffer.h
+*RenderBuffer.cpp
+*RenderBufferAttributes.h
+*RenderBufferAttributes.cpp
+*RendererPS4.cpp
+*RendererPS4.h
+*ImagePS4.cpp
+*ImagePS4.h
