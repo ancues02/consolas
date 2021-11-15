@@ -1,5 +1,8 @@
 #pragma once
-class Listener {
-protected:
-	virtual void recieveMSG(void* msg) = 0;
+
+#include <SDL_events.h>
+
+class SDL_Listener {
+public:
+	static void notify(SDL_Event* evt);
 };

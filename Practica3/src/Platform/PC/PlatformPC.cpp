@@ -3,7 +3,6 @@
 #include <SDL.h>
 #include <SDL_keycode.h>
 #include <SDL_mouse.h>
-#include <SDL_events.h>
 #include <SDL_surface.h>
 #include <iostream>
 #include <string>
@@ -14,6 +13,7 @@
 #include "../../Utils.h"
 
 std::map<const char*, FILE*> Platform::_fileMap;
+//std::vector<Observer*> Platform::_inputListeners;
 
 void Platform::Init()
 {
@@ -29,9 +29,9 @@ bool Platform::Tick()
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
 			return false;	
+		SDL_Listener::notify(&event);
 		//notifyListeners(&event);
 	}
-
 	return true;
 }
 
@@ -76,12 +76,12 @@ bool Platform::IsBigEndian() {
 
 #endif
 
-void Platform::addInputListener(Listener* listener)
+/*void Platform::addInputListener(Observer* listener)
 {
 	_inputListeners.push_back(listener);
 }
 
-void Platform::removeInputListener(Listener* listener)
+void Platform::removeInputListener(Observer* listener)
 {
 	for (auto it = _inputListeners.begin(); it != _inputListeners.end(); ++it) {
 		if ((*it) == listener){
@@ -94,7 +94,7 @@ void Platform::removeInputListener(Listener* listener)
 
 void Platform::notifyListeners(SDL_Event* evt)
 {
-	for (Listener* listener : _inputListeners) {
+	for (Observer* listener : _inputListeners) {
 		listener->notify(evt);
 	}
-}
+}*/
