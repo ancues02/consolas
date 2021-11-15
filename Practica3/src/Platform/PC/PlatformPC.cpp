@@ -26,9 +26,10 @@ void Platform::Init()
 bool Platform::Tick()
 {
 	SDL_Event event;
-	if (SDL_PollEvent(&event)) {
+	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
-			return false;		
+			return false;	
+		//notifyListeners(&event);
 	}
 
 	return true;
@@ -74,3 +75,26 @@ bool Platform::IsBigEndian() {
 }
 
 #endif
+
+void Platform::addInputListener(Listener* listener)
+{
+	_inputListeners.push_back(listener);
+}
+
+void Platform::removeInputListener(Listener* listener)
+{
+	for (auto it = _inputListeners.begin(); it != _inputListeners.end(); ++it) {
+		if ((*it) == listener){
+			_inputListeners.erase(it);
+			break;
+		}
+	}
+
+}
+
+void Platform::notifyListeners(SDL_Event* evt)
+{
+	for (Listener* listener : _inputListeners) {
+		listener->notify(evt);
+	}
+}

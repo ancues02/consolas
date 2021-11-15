@@ -1,7 +1,9 @@
 #pragma once
 #include <map>
-class string;
-class SDL_Surface;
+#include <vector>
+#include "../../Listener.h"
+
+class SDL_Event;
 
 class Platform {
 public:
@@ -13,4 +15,9 @@ public:
 	static bool IsBigEndian();
 private:
 	static std::map<const char*, FILE*> _fileMap;
+	static std::vector<Listener*> _inputListeners;
+
+	static void addInputListener(Listener* listener);
+	static void removeInputListener(Listener* listener);
+	static void notifyListeners(SDL_Event* evt);
 };
