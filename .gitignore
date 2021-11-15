@@ -34,7 +34,8 @@
 # *!/dependencies
 
 # */PS4
-
+*/.vs
+*/tmp
 */dependencies
 */exes
 */projects
