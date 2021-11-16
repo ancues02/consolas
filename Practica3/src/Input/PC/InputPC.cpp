@@ -31,6 +31,31 @@ void Input::Release()
 {
 }
 
+//TODO elegir que metodo usar
+int Input::GetHorizontalAxis()
+{
+	int ret = 0;
+	if (_keyDownEvent) {
+		if (_keyboard[SDL_SCANCODE_W])
+			ret--;
+		if (_keyboard[SDL_SCANCODE_S])
+			ret++;
+	}
+	return ret;
+}
+
+int Input::GetVerticalAxis()
+{
+	int ret = 0;
+	if (_keyDownEvent) {
+		if (_keyboard[SDL_GetScancodeFromKey(SDLK_a)])
+			ret--;
+		if (_keyboard[SDL_GetScancodeFromKey(SDLK_d)])
+			ret++;
+	}
+	return ret;
+}
+
 void Input::beNotified(SDL_Event* evt)
 {
 	switch (evt->type) {

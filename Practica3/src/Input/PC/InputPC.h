@@ -16,6 +16,9 @@ public:
 	static void Tick();
 	static void Release();
 
+	static int GetHorizontalAxis();
+	static int GetVerticalAxis();
+
 	// Metodo de listener no se si esto esta bien
 	// porque se podria llamar desde main
 	static void beNotified(SDL_Event* evt);

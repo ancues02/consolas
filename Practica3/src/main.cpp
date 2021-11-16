@@ -11,7 +11,11 @@
 
 const int nameSize = 16;
 const unsigned int baseTileSize = 64;
+const unsigned int playerSize = 20;
 float scale = 1.0f;
+
+
+int posPlayerX, posPlayerY;
 
 uint16_t** vecMaps = nullptr;//64x64 informacion del mapa
 char** vecNamesMaps = nullptr;//nombre de cada mapa
@@ -39,16 +43,11 @@ void lecturaMapa(const char* fileName) {
 	for (int x = 0; x < numMaps && !feof(file); ++x) {
 		//nombre del mapa
 		
-		//char name[nameSize];
-		//for (int y = 0; y < nameSize; ++y) {
-			//char tmp;
+		
 		vecNamesMaps[x] = new char[nameSize];
 		if (fread(vecNamesMaps[x], 16, 1, file) == 0) return;
-			//name[y] = tmp;
-		//}
-		//std::st
-		//vecNamesMaps[x] = name;  
-		std::cout << vecNamesMaps[x] << std::endl;
+			
+		//std::cout << vecNamesMaps[x] << std::endl;
 
 		//el mapa como tal, 2 planos de 64*64 el primero con informaicon del nivel
 		// un tile con valor i se pinta en 2*i -1
@@ -72,13 +71,17 @@ void lecturaMapa(const char* fileName) {
 				break;
 			if (bigEndian) player = FLIPENDIAN_16(player);
 			if (player >= 19 && player <= 22) {
-				playerStart[x][0] = y ;
+				playerStart[x][0] = y;
 				//playerStart[x][1] = y / 64;
 				playerStart[x][1] = player;
 			}
 		}
 
 	}
+
+	posPlayerX = playerStart[0][0] % baseTileSize;
+	posPlayerY = playerStart[0][0] / baseTileSize;
+
 }
 
 float toRad(float deg) {
@@ -90,7 +93,6 @@ void drawMap(char* nameMap) {
 	for (; i < numMaps; ++i) {
 		if (std::strcmp(vecNamesMaps[i], nameMap) == 0)
 			break;
-		std::cout << vecNamesMaps[i] << std::endl;
 	}
 
 	if (i > numMaps)
@@ -100,23 +102,27 @@ void drawMap(char* nameMap) {
 	int finalTileSize = baseTileSize * scale;
 	for (int j = 0; j < 64 * 64; ++j) {
 		if (vecMaps[i][j] <= 63 && vecMaps[i][j] > 0) {
-			//std::cout << "tile " << tile << std::endl;
-			Renderer::DrawImage(*Renderer::GetImage(2*vecMaps[i][j] -2), ((j % 64) - (posPlayer % 64) ) * finalTileSize + Renderer::GetWidth() / 2,
-				((j / 64) - (posPlayer / 64) ) * finalTileSize + Renderer::GetHeight() / 2, finalTileSize, finalTileSize);
+			Renderer::DrawImage(*Renderer::GetImage(2*vecMaps[i][j] -2), ((j % baseTileSize) - posPlayerX) * finalTileSize + Renderer::GetWidth() / 2 - finalTileSize /2,
+				((j / baseTileSize) - posPlayerY) * finalTileSize + Renderer::GetHeight() / 2 - finalTileSize/2, finalTileSize, finalTileSize);
 		}
 	}
+
+	Renderer::DrawRect((Renderer::GetWidth() / 2) - (playerSize / 2), (Renderer::GetHeight() / 2) - (playerSize / 2),
+		playerSize, playerSize, { 255, 255, 0, 0 });
 }
 
 void draw() {
-	
-
 	//Renderer::DrawImage(*Renderer::GetImage(0), 600, 600, 100, 100);
 	drawMap("Wolf1 Map1");
 }
 
 // Cambia los valores de la logica, para mover el grid, el angulo de la linea y el color del cuadrado
-void updateLogic() {
-	
+void handleInput() {
+	int posY = Input::GetHorizontalAxis();
+	int posX = Input::GetVerticalAxis();
+
+	posPlayerX += posX * scale ;
+	posPlayerY += posY * scale ;
 }
 
 int main(int argc, char* argv[])
@@ -126,7 +132,7 @@ int main(int argc, char* argv[])
 
 	Platform::Init();
 	Renderer::Init(false, 1920, 1080);
-	//Input::Init();
+	Input::Init();
 
 	//int cFrames = 0;
 	//auto start = std::chrono::high_resolution_clock::now();
@@ -134,15 +140,15 @@ int main(int argc, char* argv[])
 	//Renderer::ReadImage("assets/rgb.rgba");
 	Renderer::ReadImage("assets/walls.pak");
 
-	//lecturaMapa("assets/maps.pak");
+	lecturaMapa("assets/maps.pak");
 
 	while (Platform::Tick() /* && cFrames++ < totalFrames*/)
 	{
-		//Input::Tick();
+		Input::Tick();
+		handleInput();
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		//Renderer::Clear(colors[ind]);//pruebas para ver el tearing
 		//parseInput()
-		updateLogic(/*dameinput*/);
 		draw();
 		Renderer::Present();
 
