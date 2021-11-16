@@ -125,7 +125,7 @@ void Renderer::Present()
 void Renderer::ReadImage(const char* name) {
 	bool bigEndian = Platform::IsBigEndian();
 
-	FILE* file = Platform::OpenFile(name, "r");
+	FILE* file = Platform::OpenFile(name, "rb");
 
 	if (file == nullptr) return; // Ha fallado la carga
 	int w, h, num;

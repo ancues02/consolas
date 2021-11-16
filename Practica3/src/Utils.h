@@ -3,6 +3,7 @@
 
 #define FLIPENDIAN_32(n) (((n << 24) & 0xff000000) | ((n << 8) & 0x00ff0000) | ((n >> 8) & 0x0000ff00) | ((n >> 24) & 0x000000ff))
 #define FLIPENDIAN_16(n) (((n << 8) & 0xff00) | ((n >> 8) & 0x00ff))
+#define ABGR_ARGB(n) ((n & 0xff000000) | ((n << 16) & 0x00ff0000) | (n & 0x0000ff00) | ((n >> 16) & 0x000000ff))
 
 // Estructura para color
 struct Color {

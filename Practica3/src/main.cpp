@@ -10,8 +10,8 @@
 #include <stdio.h>
 
 const int nameSize = 16;
-const unsigned int baseTileSize = 20;
-float scale = 2.0f;
+const unsigned int baseTileSize = 64;
+float scale = 1.0f;
 
 uint16_t** vecMaps = nullptr;//64x64 informacion del mapa
 char** vecNamesMaps = nullptr;//nombre de cada mapa
@@ -110,7 +110,7 @@ void drawMap(char* nameMap) {
 void draw() {
 	
 
-	//Renderer::DrawImage(*Renderer::GetImage(0), 0, 0, 100, 100);
+	//Renderer::DrawImage(*Renderer::GetImage(0), 600, 600, 100, 100);
 	drawMap("Wolf1 Map1");
 }
 
@@ -126,16 +126,19 @@ int main(int argc, char* argv[])
 
 	Platform::Init();
 	Renderer::Init(false, 1920, 1080);
-	Input::Init();
+	//Input::Init();
 
 	//int cFrames = 0;
 	//auto start = std::chrono::high_resolution_clock::now();
 
+	//Renderer::ReadImage("assets/rgb.rgba");
 	Renderer::ReadImage("assets/walls.pak");
-	lecturaMapa("assets/maps.pak");
+
+	//lecturaMapa("assets/maps.pak");
+
 	while (Platform::Tick() /* && cFrames++ < totalFrames*/)
 	{
-		Input::Tick();
+		//Input::Tick();
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		//Renderer::Clear(colors[ind]);//pruebas para ver el tearing
 		//parseInput()
