@@ -15,7 +15,7 @@ const unsigned int playerSize = 20;
 float scale = 1.0f;
 
 
-int posPlayerX, posPlayerY;
+float posPlayerX, posPlayerY;
 
 uint16_t** vecMaps = nullptr;//64x64 informacion del mapa
 char** vecNamesMaps = nullptr;//nombre de cada mapa
@@ -116,13 +116,19 @@ void draw() {
 	drawMap("Wolf1 Map1");
 }
 
-// Cambia los valores de la logica, para mover el grid, el angulo de la linea y el color del cuadrado
-void handleInput() {
-	int posY = Input::GetHorizontalAxis();
-	int posX = Input::GetVerticalAxis();
 
-	posPlayerX += posX * scale ;
-	posPlayerY += posY * scale ;
+void handleInput() {
+	float posY = Input::GetHorizontalAxis();
+	float posX = Input::GetVerticalAxis();
+	
+	/*posX *= scale / 50;
+	posY *= scale / 50;*/
+
+	posX /=  50;
+	posY /=  50;
+
+	posPlayerX += posX ;
+	posPlayerY += posY ;
 }
 
 int main(int argc, char* argv[])
@@ -148,7 +154,6 @@ int main(int argc, char* argv[])
 		handleInput();
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		//Renderer::Clear(colors[ind]);//pruebas para ver el tearing
-		//parseInput()
 		draw();
 		Renderer::Present();
 
