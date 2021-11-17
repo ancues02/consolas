@@ -21,9 +21,9 @@ const float COLLISION_OFFSET = 0.2f;
 float scale = 1.0f;
 
 // Mapas
-uint16_t numMaps = 0;//numero de mapas que hay
-Map* maps = nullptr;//todos los mapas
-int mapIndex = 0;//El indicide el mapa que estamos usando
+uint16_t numMaps = 0;	//numero de mapas que hay
+Map* maps = nullptr;	//todos los mapas
+int mapIndex = 0;		//El indicide el mapa que estamos usando
 
 //Jugador
 Player* playin;
@@ -50,7 +50,7 @@ void lecturaMapa(const char* fileName) {
 	// TODO: esto en otro lado
 	int sp = maps[mapIndex].getPlayerSpawnPoint();
 	int dir = maps[mapIndex].getPlayerOrientation() % 19;
-	playin = new Player((sp % BASE_TILE_SIZE) + 0.5f, (sp / BASE_TILE_SIZE) + 0.5f, DEG_RAD(dir * 90));
+	playin = new Player((sp % BASE_TILE_SIZE) + 0.5f, (sp / BASE_TILE_SIZE) + 0.5f, DEG_RAD(((dir * 90) - 90)));
 }
 
 

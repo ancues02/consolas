@@ -146,7 +146,7 @@ void Renderer::ReadImage(const char* name) {
 		for (int i = 0; i < w * h; ++i) {
 			if (fread(&imageb[i], 4, 1, file) == 0) break;
 			if (bigEndian) imageb[i] = FLIPENDIAN_32(imageb[i]);
-			//std::cout << imageb[i] << std::endl;
+			if ((imageb[i] & 0xff000000) != 0xff000000) imageb[i] = imageb[i] & 0x00fffff;
 		}
 		
 		/*
