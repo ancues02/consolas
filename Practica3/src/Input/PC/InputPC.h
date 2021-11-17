@@ -1,5 +1,4 @@
 #pragma once
-#include <queue>
 #include "../../Utils.h"
 
 #include <SDL_events.h>
@@ -16,8 +15,8 @@ public:
 	static void Tick();
 	static void Release();
 
-	static int GetHorizontalAxis();
-	static int GetVerticalAxis();
+	static float GetHorizontalAxis();
+	static float GetVerticalAxis();
 	static int GetZoom();
 
 	// Metodo de listener no se si esto esta bien

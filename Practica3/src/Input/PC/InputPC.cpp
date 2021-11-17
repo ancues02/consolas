@@ -32,7 +32,7 @@ void Input::Release()
 }
 
 //TODO elegir que metodo usar
-int Input::GetHorizontalAxis()
+float Input::GetVerticalAxis()
 {
 	int ret = 0;
 	if (_keyDownEvent) {
@@ -44,7 +44,7 @@ int Input::GetHorizontalAxis()
 	return ret;
 }
 
-int Input::GetVerticalAxis()
+float Input::GetHorizontalAxis()
 {
 	int ret = 0;
 	if (_keyDownEvent) {

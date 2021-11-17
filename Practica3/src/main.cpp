@@ -25,7 +25,7 @@ float posPlayerX, posPlayerY;
 // Dirección jugador
 float dirPlayerX, dirPlayerY;
 float rad = 20;
-float boxAngle = 0;
+float dirPlayer = 0;
 
 // Mapas
 uint16_t numMaps = 0;//numero de mapas que hay
@@ -84,20 +84,30 @@ void drawMap(const Map& map) {
 
 void draw() {
 	drawMap(maps[mapIndex]);
-	int contactX = Renderer::GetWidth() / 2 + cos(dirPlayerX) * rad; int contactY = Renderer::GetHeight() / 2 + sin(dirPlayerY) * rad;
-	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
-
+	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, 
+		(Renderer::GetWidth() / 2) + Input::GetHorizontalAxis() * rad, (Renderer::GetHeight() / 2) + Input::GetVerticalAxis() * rad,
+		{ 255, 255, 255, 255 });
 }
 
 
 void update(double deltaTime) {
-	dirPlayerX += 0.1;
+	//dirPlayerX += 0.1;
 	//dirPlayerY += 0.1;
 
-	float posY = Input::GetHorizontalAxis();
-	float posX = Input::GetVerticalAxis();
+
+	float posX = Input::GetHorizontalAxis();
+	float posY = Input::GetVerticalAxis();
 	float zoom = Input::GetZoom();
-	
+	dirPlayerX += posX;
+	dirPlayerY += posY;
+	dirPlayerX=std::max(-1.0f, dirPlayerX);
+	dirPlayerX=std::min(1.0f, dirPlayerX);
+
+	dirPlayerY=std::max(-1.0f, dirPlayerY);
+	dirPlayerY=std::min(1.0f, dirPlayerY);
+
+
+
 	scale += zoom * deltaTime * ZOOM_PER_SECOND;
 	
 	// Clamp
