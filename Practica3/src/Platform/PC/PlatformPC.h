@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <chrono>
 
 #include "Listener.h"
 
@@ -16,11 +17,16 @@ public:
 	static bool IsBigEndian();
 	static void addInputListener(SDL_Listener* listener);
 	static void removeInputListener(SDL_Listener* listener);
+	static double getDeltaTime();
 
 private:
 	//P3
 	static std::map<const char*, FILE*> _fileMap;
 	static std::vector<SDL_Listener*> _inputListeners;
+	
+	static double deltaTime;
+	static std::chrono::high_resolution_clock::time_point lastFrameTime;
+	static std::chrono::high_resolution_clock::time_point currentFrameTime;
 
 	static void notifyListeners(SDL_Event* evt);
 };

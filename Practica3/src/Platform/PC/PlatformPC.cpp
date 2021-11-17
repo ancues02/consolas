@@ -14,18 +14,23 @@
 
 std::map<const char*, FILE*> Platform::_fileMap;
 std::vector<SDL_Listener*> Platform::_inputListeners;
+double Platform::deltaTime;
+std::chrono::high_resolution_clock::time_point Platform::lastFrameTime = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point Platform::currentFrameTime = std::chrono::high_resolution_clock::now();
 
 void Platform::Init()
 {
 	int e = SDL_Init(SDL_INIT_EVERYTHING);
 	if (e > 0)
 		throw "Algo fallo iniciando SDL";
-
-
 }
 
 bool Platform::Tick()
 {
+	lastFrameTime = currentFrameTime;
+	currentFrameTime = std::chrono::high_resolution_clock::now();
+	deltaTime = (std::chrono::duration_cast<std::chrono::milliseconds>(currentFrameTime - lastFrameTime).count()) / 1000.0;
+
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
@@ -96,6 +101,11 @@ void Platform::notifyListeners(SDL_Event* evt)
 	for (SDL_Listener* listener : _inputListeners) {
 		listener->notify(evt);
 	}
+}
+
+double Platform::getDeltaTime()
+{
+	return deltaTime;
 }
 
 #endif

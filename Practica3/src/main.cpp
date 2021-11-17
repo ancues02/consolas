@@ -85,7 +85,9 @@ void draw() {
 }
 
 
-void update(double deltaTime) {
+void update() {
+	double deltaTime = Platform::getDeltaTime();
+
 	float posX = Input::GetHorizontalAxis();
 	float posY = Input::GetVerticalAxis();
 	float zoom = Input::GetZoom();
@@ -130,17 +132,10 @@ int main(int argc, char* argv[])
 
 	lecturaMapa("assets/maps.pak");
 
-	std::chrono::high_resolution_clock::time_point lastFrameTime, actualFrameTime;
-	double deltaTime;
-	lastFrameTime = std::chrono::high_resolution_clock::now();
 	while (Platform::Tick())
 	{
-		actualFrameTime = std::chrono::high_resolution_clock::now();
-		deltaTime = (std::chrono::duration_cast<std::chrono::milliseconds>(actualFrameTime - lastFrameTime).count())/1000.0;
-		lastFrameTime = actualFrameTime;
-
 		Input::Tick();
-		update(deltaTime);
+		update();
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		draw();
 		Renderer::Present();
