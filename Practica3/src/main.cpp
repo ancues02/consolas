@@ -8,11 +8,11 @@
 
 #include "Utils.h"
 #include "Logic/Map.h"
+#include "Logic/Player.h"
 #include <stdio.h>
 #include <algorithm>
 
 const unsigned int BASE_TILE_SIZE = 64;
-const unsigned int PLAYER_SIZE = 5;
 const float ZOOM_PER_SECOND = 1;
 const float TILES_PER_SECOND = 3;
 const float SCALE_MAX = 3.0f;
@@ -20,17 +20,13 @@ const float SCALE_MIN = 0.5f;
 const float COLLISION_OFFSET = 0.2f;
 float scale = 1.0f;
 
-// Posicion del jugador
-float posPlayerX, posPlayerY;
-// Dirección jugador
-float dirPlayerX, dirPlayerY;
-float rad = 20;
-float dirPlayer = 0;
-
 // Mapas
 uint16_t numMaps = 0;//numero de mapas que hay
 Map* maps = nullptr;//todos los mapas
 int mapIndex = 0;//El indicide el mapa que estamos usando
+
+//Jugador
+Player* playin;
 
 void lecturaMapa(const char* fileName) {
 	bool bigEndian = Platform::IsBigEndian();
@@ -52,95 +48,82 @@ void lecturaMapa(const char* fileName) {
 	}
 
 	// TODO: esto en otro lado
-	posPlayerX = maps[mapIndex].getPlayerSpawnPoint() % BASE_TILE_SIZE;
-	posPlayerY = maps[mapIndex].getPlayerSpawnPoint() / BASE_TILE_SIZE;
-	int dir = maps[mapIndex].getPlayerOrientation()%19;
-	dirPlayerX = sin(DEG_RAD(dir * 90));
-	dirPlayerY = cos(DEG_RAD(dir * 90));
-	//dirPlayerX = 0;
-	//dirPlayerY = 1;
+	int sp = maps[mapIndex].getPlayerSpawnPoint();
+	int dir = maps[mapIndex].getPlayerOrientation() % 19;
+	playin = new Player((sp % BASE_TILE_SIZE) + 0.5f, (sp / BASE_TILE_SIZE) + 0.5f, DEG_RAD(dir * 90));
 }
 
 
 void drawMap(const Map& map) {
-
 	int finalTileSize = BASE_TILE_SIZE * scale;
 	for (int j = 0; j < map.getSize(); ++j) {
 		if (map.getTile(j) <= 63 && map.getTile(j) > 0) {
 			Renderer::DrawImage(*Renderer::GetImage(2* map.getTile(j) -2), 
-				((j % BASE_TILE_SIZE) - posPlayerX) * finalTileSize + Renderer::GetWidth() / 2,
-				((j / BASE_TILE_SIZE) - posPlayerY) * finalTileSize + Renderer::GetHeight() / 2, 
+				((j % BASE_TILE_SIZE) - playin->getPosX()) * finalTileSize + Renderer::GetWidth() / 2,
+				((j / BASE_TILE_SIZE) - playin->getPosY()) * finalTileSize + Renderer::GetHeight() / 2, 
 				finalTileSize, 
 				finalTileSize);
 		}
 	}
+}
 
-	Renderer::DrawRect((Renderer::GetWidth() / 2) - (PLAYER_SIZE / 2), 
+void drawPlayer(const Player* Player) {
+	Renderer::DrawRect((Renderer::GetWidth() / 2) - (PLAYER_SIZE / 2),
 		(Renderer::GetHeight() / 2) - (PLAYER_SIZE / 2),
-		PLAYER_SIZE, 
-		PLAYER_SIZE, 
+		PLAYER_SIZE,
+		PLAYER_SIZE,
 		{ 255, 255, 0, 0 });
+
+	int contactX = (Renderer::GetWidth() / 2) + (cos(playin->getAngle()) * PLAYER_BAR_SIZE); 
+	int contactY = (Renderer::GetHeight() / 2) + (sin(playin->getAngle()) * PLAYER_BAR_SIZE);
+	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
 }
 
 void draw() {
 	drawMap(maps[mapIndex]);
-	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, 
-		(Renderer::GetWidth() / 2) + Input::GetHorizontalAxis() * rad, (Renderer::GetHeight() / 2) + Input::GetVerticalAxis() * rad,
-		{ 255, 255, 255, 255 });
+	drawPlayer(playin);
 }
 
 
 void update(double deltaTime) {
-	//dirPlayerX += 0.1;
-	//dirPlayerY += 0.1;
-
-
 	float posX = Input::GetHorizontalAxis();
 	float posY = Input::GetVerticalAxis();
 	float zoom = Input::GetZoom();
-	dirPlayerX += posX;
-	dirPlayerY += posY;
-	dirPlayerX=std::max(-1.0f, dirPlayerX);
-	dirPlayerX=std::min(1.0f, dirPlayerX);
 
-	dirPlayerY=std::max(-1.0f, dirPlayerY);
-	dirPlayerY=std::min(1.0f, dirPlayerY);
-
-
+	playin->calculateAngle(posX, posY);
 
 	scale += zoom * deltaTime * ZOOM_PER_SECOND;
 	
 	// Clamp
 	scale = std::max(SCALE_MIN, scale);
 	scale = std::min(scale, SCALE_MAX);
-	
 
-
-	float nextX = posPlayerX + posX * TILES_PER_SECOND * deltaTime;
-	float nextY = posPlayerY + posY * TILES_PER_SECOND * deltaTime;
+	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * deltaTime;
+	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * deltaTime;
 	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
 	// ni en la de abajo del tile hay un tile
-	if (maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), posPlayerY )
-		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), posPlayerY + (COLLISION_OFFSET * posX))
-		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), posPlayerY + (COLLISION_OFFSET * -posX))) {
-		posPlayerX = nextX;
+	if (maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), playin->getPosY())
+		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), playin->getPosY() + (COLLISION_OFFSET * posX))
+		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), playin->getPosY() + (COLLISION_OFFSET * -posX))) {
+		playin->setPosX(nextX);
 	}
 	//te mueves en vertical similar a horizontal pero comprobaciones en la x
-	if (maps[mapIndex].isTransitable(posPlayerX , nextY + (COLLISION_OFFSET * posY)) &&
-		maps[mapIndex].isTransitable(posPlayerX + (COLLISION_OFFSET * posY), nextY + (COLLISION_OFFSET * posY))
-		&& maps[mapIndex].isTransitable(posPlayerX + (COLLISION_OFFSET * -posY), nextY + (COLLISION_OFFSET * posY))) {
-		posPlayerY = nextY;
+	if (maps[mapIndex].isTransitable(playin->getPosX(), nextY + (COLLISION_OFFSET * posY)) &&
+		maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * posY), nextY + (COLLISION_OFFSET * posY))
+		&& maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * -posY), nextY + (COLLISION_OFFSET * posY))) {
+		playin->setPosY(nextY);
 	}
 }
 
 void free() {
 	delete[] maps;
+	delete playin;
 }
 
 int main(int argc, char* argv[])
 {
 	Platform::Init();
-	Renderer::Init(false, 1280, 720);
+	Renderer::Init(false, 1920, 1080);
 	Input::Init();
 
 	Renderer::ReadImage("assets/walls.pak");
