@@ -2,6 +2,16 @@
 
 #include "../../Platform/PC/Listener.h"
 
+
+// Estructura para recoger el input y poder resetearlo cada frame
+struct InputInfo
+{
+	bool _keyUpEvent = false;
+	bool _keyDownEvent = false;
+	bool _mouseMoveEvent = false;
+	bool _mouseButtonEvent = false;
+};
+
 /*
 	Clase para escuchar los eventos de Platform 
 	y procesarlos posteriormente en Input.
@@ -11,9 +21,9 @@ public:
 	InputListener();
 	~InputListener();
 	virtual void notify(SDL_Event* evt);
-	
-	bool _keyUpEvent,
-		 _keyDownEvent,
-		 _mouseMoveEvent,
-		 _mouseButtonEvent;
+	InputInfo getFrameInfo();
+
+private:
+	InputInfo _inputInfo;
+	void resetInfo();
 };

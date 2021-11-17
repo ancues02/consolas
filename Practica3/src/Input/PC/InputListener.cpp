@@ -2,10 +2,7 @@
 #include "InputPC.h"
 
 InputListener::InputListener() : 
-	_keyDownEvent(false), 
-	_keyUpEvent(false), 
-	_mouseMoveEvent(false), 
-	_mouseButtonEvent(false)
+	_inputInfo()
 {
 }
 
@@ -17,19 +14,35 @@ void InputListener::notify(SDL_Event* evt)
 {
 	switch (evt->type) {
 	case SDL_KEYDOWN:
-		_keyDownEvent = true;
+		_inputInfo._keyDownEvent = true;
 		break;
 	case SDL_KEYUP:
-		_keyUpEvent = true; //aqui hacer mas cosas y en los demas case
+		_inputInfo._keyUpEvent = true; //aqui hacer mas cosas y en los demas case
 		break;
 	case SDL_MOUSEMOTION:
-		_mouseMoveEvent = true;
+		_inputInfo._mouseMoveEvent = true;
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		_mouseButtonEvent = true;
+		_inputInfo._mouseButtonEvent = true;
 		break;
 	case SDL_MOUSEBUTTONUP:
-		_mouseButtonEvent = true;
+		_inputInfo._mouseButtonEvent = true;
 		break;
 	}
+}
+
+InputInfo InputListener::getFrameInfo()
+{
+	InputInfo frameInfo = _inputInfo;
+	// TODO: esto deberia de resetearse pero va peor
+	//resetInfo();
+	return frameInfo;
+}
+
+void InputListener::resetInfo()
+{
+	_inputInfo._keyDownEvent = false;
+	_inputInfo._keyUpEvent = false;
+	_inputInfo._mouseButtonEvent = false;
+	_inputInfo._mouseMoveEvent = false;
 }

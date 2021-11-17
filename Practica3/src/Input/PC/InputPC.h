@@ -23,6 +23,9 @@ private:
 	// Listener para escuchar los eventos de Platform
 	static InputListener _inputListener;
 
+	// Informacion sobre el input recibido en el frame
+	static InputInfo _frameInfo;
+
 	// Referencia al teclado para toda la ejecucion
 	static const uint8_t* _keyboard;
 };
