@@ -22,6 +22,10 @@ float scale = 1.0f;
 
 // Posicion del jugador
 float posPlayerX, posPlayerY;
+// Dirección jugador
+float dirPlayerX, dirPlayerY;
+float rad = 20;
+float boxAngle = 0;
 
 // Mapas
 uint16_t numMaps = 0;//numero de mapas que hay
@@ -50,6 +54,11 @@ void lecturaMapa(const char* fileName) {
 	// TODO: esto en otro lado
 	posPlayerX = maps[mapIndex].getPlayerSpawnPoint() % BASE_TILE_SIZE;
 	posPlayerY = maps[mapIndex].getPlayerSpawnPoint() / BASE_TILE_SIZE;
+	int dir = maps[mapIndex].getPlayerOrientation()%19;
+	dirPlayerX = sin(DEG_RAD(dir * 90));
+	dirPlayerY = cos(DEG_RAD(dir * 90));
+	//dirPlayerX = 0;
+	//dirPlayerY = 1;
 }
 
 
@@ -75,10 +84,16 @@ void drawMap(const Map& map) {
 
 void draw() {
 	drawMap(maps[mapIndex]);
+	int contactX = Renderer::GetWidth() / 2 + cos(dirPlayerX) * rad; int contactY = Renderer::GetHeight() / 2 + sin(dirPlayerY) * rad;
+	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
+
 }
 
 
 void update(double deltaTime) {
+	dirPlayerX += 0.1;
+	//dirPlayerY += 0.1;
+
 	float posY = Input::GetHorizontalAxis();
 	float posX = Input::GetVerticalAxis();
 	float zoom = Input::GetZoom();
