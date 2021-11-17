@@ -18,6 +18,7 @@ public:
 
 	static int GetHorizontalAxis();
 	static int GetVerticalAxis();
+	static int GetZoom();
 
 	// Metodo de listener no se si esto esta bien
 	// porque se podria llamar desde main

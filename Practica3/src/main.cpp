@@ -9,19 +9,24 @@
 #include "Utils.h"
 #include "Logic/Map.h"
 #include <stdio.h>
+#include <algorithm>
 
-const int nameSize = 16;
-const unsigned int baseTileSize = 64;
-const unsigned int playerSize = 20;
+const unsigned int BASE_TILE_SIZE = 64;
+const unsigned int PLAYER_SIZE = 5;
+const float ZOOM_PER_SECOND = 1;
+const float TILES_PER_SECOND = 3;
+const float SCALE_MAX = 3.0f;
+const float SCALE_MIN = 0.5f;
+const float COLLISION_OFFSET = 0.2f;
 float scale = 1.0f;
 
 // Posicion del jugador
 float posPlayerX, posPlayerY;
 
 // Mapas
-uint16_t numMaps = 0;
-Map* maps = nullptr;
-int mapIndex = 0;
+uint16_t numMaps = 0;//numero de mapas que hay
+Map* maps = nullptr;//todos los mapas
+int mapIndex = 0;//El indicide el mapa que estamos usando
 
 void lecturaMapa(const char* fileName) {
 	bool bigEndian = Platform::IsBigEndian();
@@ -43,31 +48,28 @@ void lecturaMapa(const char* fileName) {
 	}
 
 	// TODO: esto en otro lado
-	posPlayerX = maps[mapIndex].getPlayerSpawnPoint() % baseTileSize;
-	posPlayerY = maps[mapIndex].getPlayerSpawnPoint() / baseTileSize;
+	posPlayerX = maps[mapIndex].getPlayerSpawnPoint() % BASE_TILE_SIZE;
+	posPlayerY = maps[mapIndex].getPlayerSpawnPoint() / BASE_TILE_SIZE;
 }
 
-float toRad(float deg) {
-	return (deg * 3.14) / 180;
-}
 
 void drawMap(const Map& map) {
 
-	int finalTileSize = baseTileSize * scale;
+	int finalTileSize = BASE_TILE_SIZE * scale;
 	for (int j = 0; j < map.getSize(); ++j) {
 		if (map.getTile(j) <= 63 && map.getTile(j) > 0) {
 			Renderer::DrawImage(*Renderer::GetImage(2* map.getTile(j) -2), 
-				((j % baseTileSize) - posPlayerX) * finalTileSize + Renderer::GetWidth() / 2 - finalTileSize /2,
-				((j / baseTileSize) - posPlayerY) * finalTileSize + Renderer::GetHeight() / 2 - finalTileSize/2, 
+				((j % BASE_TILE_SIZE) - posPlayerX) * finalTileSize + Renderer::GetWidth() / 2,
+				((j / BASE_TILE_SIZE) - posPlayerY) * finalTileSize + Renderer::GetHeight() / 2, 
 				finalTileSize, 
 				finalTileSize);
 		}
 	}
 
-	Renderer::DrawRect((Renderer::GetWidth() / 2) - (playerSize / 2), 
-		(Renderer::GetHeight() / 2) - (playerSize / 2),
-		playerSize, 
-		playerSize, 
+	Renderer::DrawRect((Renderer::GetWidth() / 2) - (PLAYER_SIZE / 2), 
+		(Renderer::GetHeight() / 2) - (PLAYER_SIZE / 2),
+		PLAYER_SIZE, 
+		PLAYER_SIZE, 
 		{ 255, 255, 0, 0 });
 }
 
@@ -75,15 +77,35 @@ void draw() {
 	drawMap(maps[mapIndex]);
 }
 
-void handleInput() {
+
+void update(double deltaTime) {
 	float posY = Input::GetHorizontalAxis();
 	float posX = Input::GetVerticalAxis();
+	float zoom = Input::GetZoom();
+	
+	scale += zoom * deltaTime * ZOOM_PER_SECOND;
+	
+	// Clamp
+	scale = std::max(SCALE_MIN, scale);
+	scale = std::min(scale, SCALE_MAX);
+	
 
-	posX /=  50;
-	posY /=  50;
 
-	posPlayerX += posX ;
-	posPlayerY += posY ;
+	float nextX = posPlayerX + posX * TILES_PER_SECOND * deltaTime;
+	float nextY = posPlayerY + posY * TILES_PER_SECOND * deltaTime;
+	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
+	// ni en la de abajo del tile hay un tile
+	if (maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), posPlayerY )
+		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), posPlayerY + (COLLISION_OFFSET * posX))
+		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), posPlayerY + (COLLISION_OFFSET * -posX))) {
+		posPlayerX = nextX;
+	}
+	//te mueves en vertical similar a horizontal pero comprobaciones en la x
+	if (maps[mapIndex].isTransitable(posPlayerX , nextY + (COLLISION_OFFSET * posY)) &&
+		maps[mapIndex].isTransitable(posPlayerX + (COLLISION_OFFSET * posY), nextY + (COLLISION_OFFSET * posY))
+		&& maps[mapIndex].isTransitable(posPlayerX + (COLLISION_OFFSET * -posY), nextY + (COLLISION_OFFSET * posY))) {
+		posPlayerY = nextY;
+	}
 }
 
 void free() {
@@ -93,21 +115,29 @@ void free() {
 int main(int argc, char* argv[])
 {
 	Platform::Init();
-	Renderer::Init(false, 1920, 1080);
+	Renderer::Init(false, 1280, 720);
 	Input::Init();
 
 	Renderer::ReadImage("assets/walls.pak");
 
 	lecturaMapa("assets/maps.pak");
 
+	std::chrono::high_resolution_clock::time_point lastFrameTime, actualFrameTime;
+	double deltaTime;
+	lastFrameTime = std::chrono::high_resolution_clock::now();
 	while (Platform::Tick())
 	{
+		actualFrameTime = std::chrono::high_resolution_clock::now();
+		deltaTime = (std::chrono::duration_cast<std::chrono::milliseconds>(actualFrameTime - lastFrameTime).count())/1000.0;
+		lastFrameTime = actualFrameTime;
+
 		Input::Tick();
-		handleInput();
+		update(deltaTime);
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		draw();
 		Renderer::Present();
 	}
+	
 
 	free();
 	Renderer::Release();

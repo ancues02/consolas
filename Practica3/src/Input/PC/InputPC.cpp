@@ -56,6 +56,18 @@ int Input::GetVerticalAxis()
 	return ret;
 }
 
+int Input::GetZoom()
+{
+	int ret = 0;
+	if (_keyDownEvent) {
+		if (_keyboard[SDL_GetScancodeFromKey(SDLK_SPACE)])
+			ret--;
+		if (_keyboard[SDL_GetScancodeFromKey(SDLK_RETURN)])
+			ret++;
+	}
+	return ret;
+}
+
 void Input::beNotified(SDL_Event* evt)
 {
 	switch (evt->type) {

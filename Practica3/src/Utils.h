@@ -4,6 +4,7 @@
 #define FLIPENDIAN_32(n) (((n << 24) & 0xff000000) | ((n << 8) & 0x00ff0000) | ((n >> 8) & 0x0000ff00) | ((n >> 24) & 0x000000ff))
 #define FLIPENDIAN_16(n) (((n << 8) & 0xff00) | ((n >> 8) & 0x00ff))
 #define ABGR_ARGB(n) ((n & 0xff000000) | ((n << 16) & 0x00ff0000) | (n & 0x0000ff00) | ((n >> 16) & 0x000000ff))
+#define DEG_RAD(n) (n*3.1415 /180)
 
 // Estructura para color
 struct Color {
@@ -16,10 +17,3 @@ static uint32_t bitshiftToUint32(const Color& col) {
 }
 
 
-//eventos comunes a PS4 y PC. movmiendo y zoom
-enum EventType { MoveX, MoveY, ZoomIn, ZoomOut, Escape };
-
-struct InputEvent {
-	EventType key;
-	float magnitude;
-};

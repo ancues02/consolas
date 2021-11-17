@@ -79,7 +79,7 @@ const char* Map::getName() const
 
 bool Map::isTransitable(int x, int y) const
 {
-	return false;
+	return getTile(x + y * _width) < 1 || getTile(x + y * _width) > 63;
 }
 
 uint16_t Map::getPlayerSpawnPoint() const
