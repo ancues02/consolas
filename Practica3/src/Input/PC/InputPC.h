@@ -1,6 +1,6 @@
 #pragma once
 #include "../../Utils.h"
-
+#include "InputListener.h"
 #include <SDL_events.h>
 
 class Input{
@@ -19,20 +19,10 @@ public:
 	static float GetVerticalAxis();
 	static int GetZoom();
 
-	// Metodo de listener no se si esto esta bien
-	// porque se podria llamar desde main
-	static void beNotified(SDL_Event* evt);
-
 private:
+	// Listener para escuchar los eventos de Platform
+	static InputListener _inputListener;
+
+	// Referencia al teclado para toda la ejecucion
 	static const uint8_t* _keyboard;
-	static bool _keyUpEvent,
-				_keyDownEvent,
-				_mouseMoveEvent,
-				_mouseButtonEvent;
-
-	static bool _mouseState[3];
-	static int _mouseX;
-	static int _mouseY;
-
-	static void reset();
 };

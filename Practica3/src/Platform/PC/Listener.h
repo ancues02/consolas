@@ -1,10 +1,9 @@
 #pragma once
 #ifdef PLATFORM_PC
-
 #include <SDL_events.h>
 
 class SDL_Listener {
 public:
-	static void notify(SDL_Event* evt);
+	virtual void notify(SDL_Event* evt) = 0;
 };
 #endif

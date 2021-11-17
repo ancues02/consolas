@@ -2,14 +2,14 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <stdio.h>
+#include <algorithm>
+
 #include "Platform/Platform.h"
 #include "Renderer/Renderer.h"
 #include "Input/Input.h"
-
-#include "Utils.h"
 #include "Logic/Map.h"
-#include <stdio.h>
-#include <algorithm>
+#include "Utils.h"
 
 const unsigned int BASE_TILE_SIZE = 64;
 const unsigned int PLAYER_SIZE = 5;
@@ -141,6 +141,8 @@ int main(int argc, char* argv[])
 {
 	Platform::Init();
 	Renderer::Init(false, 1280, 720);
+
+	
 	Input::Init();
 
 	Renderer::ReadImage("assets/walls.pak");

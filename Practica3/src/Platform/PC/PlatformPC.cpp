@@ -13,13 +13,14 @@
 #include "../../Utils.h"
 
 std::map<const char*, FILE*> Platform::_fileMap;
-//std::vector<Observer*> Platform::_inputListeners;
+std::vector<SDL_Listener*> Platform::_inputListeners;
 
 void Platform::Init()
 {
 	int e = SDL_Init(SDL_INIT_EVERYTHING);
 	if (e > 0)
 		throw "Algo fallo iniciando SDL";
+
 
 }
 
@@ -29,8 +30,7 @@ bool Platform::Tick()
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
 			return false;	
-		SDL_Listener::notify(&event);
-		//notifyListeners(&event);
+		notifyListeners(&event);
 	}
 	return true;
 }
@@ -74,14 +74,13 @@ bool Platform::IsBigEndian() {
 	return SDL_BYTEORDER == SDL_BIG_ENDIAN;
 }
 
-#endif
 
-/*void Platform::addInputListener(Observer* listener)
+void Platform::addInputListener(SDL_Listener* listener)
 {
 	_inputListeners.push_back(listener);
 }
 
-void Platform::removeInputListener(Observer* listener)
+void Platform::removeInputListener(SDL_Listener* listener)
 {
 	for (auto it = _inputListeners.begin(); it != _inputListeners.end(); ++it) {
 		if ((*it) == listener){
@@ -94,7 +93,9 @@ void Platform::removeInputListener(Observer* listener)
 
 void Platform::notifyListeners(SDL_Event* evt)
 {
-	for (Observer* listener : _inputListeners) {
+	for (SDL_Listener* listener : _inputListeners) {
 		listener->notify(evt);
 	}
-}*/
+}
+
+#endif
