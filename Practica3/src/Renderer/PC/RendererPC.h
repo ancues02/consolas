@@ -7,7 +7,7 @@ class SDL_Renderer;
 
 class Renderer {
 public:
-	static void Init(bool fullscreen, int width, int height);
+	static bool Init(bool fullscreen, int width, int height);
 	static void Release();
 	static void Clear(const Color& c);
 	static void PutPixel(int x, int y, const Color& c);

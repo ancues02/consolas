@@ -10,7 +10,7 @@ public:
 		MID
 	};
 
-	static void Init();
+	static bool Init();
 	static void Tick();
 	static void Release();
 

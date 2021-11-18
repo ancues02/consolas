@@ -7,7 +7,7 @@ InputInfo Input::_frameInfo;
 const uint8_t* Input::_keyboard = nullptr;
 SDL_GameController* Input::_controller = nullptr;
 
-void Input::Init()
+bool Input::Init()
 {
 	// Referencia al teclado para toda la ejecucion
 	_keyboard = SDL_GetKeyboardState(0);
@@ -19,6 +19,8 @@ void Input::Init()
 	
 	// Ponemos a escuchar los eventos a nuestro listener
 	Platform::addInputListener(&_inputListener);
+
+	return true;
 }
 
 void Input::Tick()

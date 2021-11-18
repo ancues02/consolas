@@ -7,8 +7,6 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
-//#include <stdlib.h>
-//#include <unistd.h>
 
 #include "../../Utils.h"
 
@@ -18,11 +16,15 @@ double Platform::deltaTime;
 std::chrono::high_resolution_clock::time_point Platform::lastFrameMilli = std::chrono::high_resolution_clock::now();
 std::chrono::high_resolution_clock::time_point Platform::currentFrameMilli = std::chrono::high_resolution_clock::now();
 
-void Platform::Init()
+bool Platform::Init()
 {
 	int e = SDL_Init(SDL_INIT_EVERYTHING);
-	if (e > 0)
-		throw "Algo fallo iniciando SDL";
+	if (e > 0) {
+		std::cerr << "Algo fallo iniciando SDL" << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 bool Platform::Tick()

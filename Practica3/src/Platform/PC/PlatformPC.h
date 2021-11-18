@@ -7,7 +7,7 @@
 
 class Platform {
 public:
-	static void Init();
+	static bool Init();
 	static bool Tick();
 	static void Release();
 

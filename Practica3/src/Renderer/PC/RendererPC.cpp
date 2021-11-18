@@ -14,7 +14,7 @@ SDL_Renderer* Renderer::_renderer = nullptr;
 // TODO: hacer el release de cada textura
 Image** Renderer::_textures = nullptr;
 
-void Renderer::Init(bool fullscreen, int width, int height)
+bool Renderer::Init(bool fullscreen, int width, int height)
 {
 	if (fullscreen) {
 		_window = SDL_CreateWindow("P2_VC", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -24,14 +24,20 @@ void Renderer::Init(bool fullscreen, int width, int height)
 		_window = SDL_CreateWindow("P2_VC", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 			width, height, SDL_WINDOW_SHOWN);
 	}
-	if (!_window) 
-		throw "Algo fallo iniciando la ventana de SDL";
+	if (!_window) {
+		std::cerr << "Fallo iniciando la ventana de SDL" << std::endl;
+		return false;
+	}
 
 	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!_renderer) 
-		throw "Algo fallo iniciando el renderer de SDL";	
+	if (!_renderer) {
+		std::cerr << "Fallo iniciando el renderer de SDL" << std::endl;
+		return false;
+	}
 	SDL_GetWindowSize(_window, &_width, &_height);
 	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+
+	return true;
 }
 
 void Renderer::Release()

@@ -22,19 +22,28 @@ float scale = 1.0f;
 // Mapas
 uint16_t numMaps = 0;	//numero de mapas que hay
 Map* maps = nullptr;	//todos los mapas
-int mapIndex = 0;		//El indicide el mapa que estamos usando
+int mapIndex = 0;		//El indice arbitrario del mapa que estamos usando, si es mayor que numMaps o menor que 0 falla
 
 //Jugador
-Player* playin;
+Player* playin = nullptr;
 
-void lecturaMapa(const char* fileName) {
+/*
+* Lectura del mapa.
+* abrir el archivo, si no se ha podido dejar de hacer cosas
+* pillamos el numero de mapas a leer y creamos un array de mapas de ese tamanio
+* cargamos un mapa y le pasamos el endianess. Si al cargar un mapa falla, se dejan de
+* intentar cargas mas. 
+* 
+* Devuelve false si ha encontrado un error, lectura del fichero o lectura de un mapa
+*/
+bool lecturaMapa(const char* fileName) {
 	bool bigEndian = Platform::IsBigEndian();
 
 	FILE* file = Platform::OpenFile(fileName, "rb");
-	if (file == nullptr) return; // Ha fallado la carga
+	if (file == nullptr) return false; // Ha fallado la carga
 
 	// Numero de mapas
-	if (fread(&numMaps, 2, 1, file) == 0) return;
+	if (fread(&numMaps, 2, 1, file) == 0) return false;
 	if (bigEndian)
 		numMaps = FLIPENDIAN_16((int)numMaps);
 
@@ -42,14 +51,13 @@ void lecturaMapa(const char* fileName) {
 	bool loaded = true;
 	int i = 0;
 	while (i < numMaps && !feof(file) && loaded) {
-		loaded = maps[i].load(file, Platform::IsBigEndian());
+		loaded = maps[i].load(file, bigEndian);
 		i++;
 	}
+	if (!loaded) return false;
 
-	// TODO: esto en otro lado
-	int sp = maps[mapIndex].getPlayerSpawnPoint();
-	int dir = maps[mapIndex].getPlayerOrientation() % 19;
-	playin = new Player((sp % BASE_TILE_SIZE) + 0.5f, (sp / BASE_TILE_SIZE) + 0.5f, DEG_RAD(((dir * 90) - 90)));
+	
+	return true;
 }
 
 
@@ -67,6 +75,13 @@ void drawMap(const Map& map) {
 	}
 }
 
+//crear al player en funcion del mapa
+void createPlayer() {
+	int sp = maps[mapIndex].getPlayerSpawnPoint();
+	int dir = maps[mapIndex].getPlayerOrientation() % 19;
+	playin = new Player((sp % BASE_TILE_SIZE) + 0.5f, (sp / BASE_TILE_SIZE) + 0.5f, DEG_RAD(((dir * 90) - 90)));
+}
+
 void drawPlayer() {
 	// Línea
 	int contactX = (Renderer::GetWidth() / 2) + (cos(playin->getAngle()) * PLAYER_BAR_SIZE); 
@@ -80,6 +95,7 @@ void drawPlayer() {
 		PLAYER_SIZE,
 		{ 255, 255, 0, 0 });
 }
+
 
 void draw() {
 	drawMap(maps[mapIndex]);
@@ -95,7 +111,6 @@ void update() {
 	float zoom = Input::GetZoom();
 
 	if (zoom) {
-
 		scale += zoom * deltaTime * ZOOM_PER_SECOND;
 		scale = std::max(SCALE_MIN, scale);
 		scale = std::min(scale, SCALE_MAX);
@@ -105,9 +120,16 @@ void update() {
 
 	playin->calculateAngle(posX, posY);
 	// Clamp
-
 	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * deltaTime;
 	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * deltaTime;
+
+
+	//esto para comprobar el siguiente tile
+	if (posX > 0)posX = 1;
+	else if (posX < 0) posX = -1;
+	if (posY > 0)posY = 1;
+	else if (posY < 0) posY = -1;
+
 	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
 	// ni en la de abajo del tile hay un tile
 	int tmpX = nextX + (COLLISION_OFFSET * posX);
@@ -130,15 +152,23 @@ void free() {
 	delete playin;
 }
 
+
 int main(int argc, char* argv[])
 {
-	Platform::Init();
+	if (!Platform::Init())
+		return -1;
 	Renderer::Init(false, 1920, 1080);
-	Input::Init();
+	if (!Input::Init())
+		return -1;
 
 	Renderer::ReadImage("assets/walls.pak");
 
-	lecturaMapa("assets/maps.pak");
+	if (!lecturaMapa("assets/maps.pak")) {
+		free();
+		return -1;
+	}	
+
+	createPlayer();
 
 	int cFrames = 0;
 	auto start = std::chrono::high_resolution_clock::now();
@@ -150,6 +180,7 @@ int main(int argc, char* argv[])
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		draw();
 		Renderer::Present();
+		std::cout << 1 / Platform::getDeltaTime() << std::endl;
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
