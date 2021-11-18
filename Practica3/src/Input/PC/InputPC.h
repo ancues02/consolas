@@ -1,7 +1,6 @@
 #pragma once
 #include "../../Utils.h"
 #include "InputListener.h"
-#include <SDL_events.h>
 
 class Input{
 public:

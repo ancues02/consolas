@@ -1,5 +1,8 @@
+#ifdef PLATFORM_PC
+
 #include "InputListener.h"
 #include "InputPC.h"
+#include <SDL_events.h>
 
 InputListener::InputListener() : 
 	_inputInfo()
@@ -46,3 +49,5 @@ void InputListener::resetInfo()
 	_inputInfo._mouseButtonEvent = false;
 	_inputInfo._mouseMoveEvent = false;
 }
+
+#endif // PLATFORM_PC

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
-#include <thread>
 #include <stdio.h>
 #include <algorithm>
 
@@ -56,32 +55,35 @@ void lecturaMapa(const char* fileName) {
 
 void drawMap(const Map& map) {
 	int finalTileSize = BASE_TILE_SIZE * scale;
+	int centerX = Renderer::GetWidth() / 2, centerY = Renderer::GetHeight() / 2;
 	for (int j = 0; j < map.getSize(); ++j) {
 		if (map.getTile(j) <= 63 && map.getTile(j) > 0) {
 			Renderer::DrawImage(*Renderer::GetImage(2* map.getTile(j) -2), 
-				((j % BASE_TILE_SIZE) - playin->getPosX()) * finalTileSize + Renderer::GetWidth() / 2,
-				((j / BASE_TILE_SIZE) - playin->getPosY()) * finalTileSize + Renderer::GetHeight() / 2, 
+				((j % BASE_TILE_SIZE) - playin->getPosX()) * finalTileSize + centerX,
+				((j / BASE_TILE_SIZE) - playin->getPosY()) * finalTileSize + centerY,
 				finalTileSize, 
 				finalTileSize);
 		}
 	}
 }
 
-void drawPlayer(const Player* Player) {
+void drawPlayer() {
+	// Línea
+	int contactX = (Renderer::GetWidth() / 2) + (cos(playin->getAngle()) * PLAYER_BAR_SIZE); 
+	int contactY = (Renderer::GetHeight() / 2) + (sin(playin->getAngle()) * PLAYER_BAR_SIZE);
+	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
+
+	// Jugador
 	Renderer::DrawRect((Renderer::GetWidth() / 2) - (PLAYER_SIZE / 2),
 		(Renderer::GetHeight() / 2) - (PLAYER_SIZE / 2),
 		PLAYER_SIZE,
 		PLAYER_SIZE,
 		{ 255, 255, 0, 0 });
-
-	int contactX = (Renderer::GetWidth() / 2) + (cos(playin->getAngle()) * PLAYER_BAR_SIZE); 
-	int contactY = (Renderer::GetHeight() / 2) + (sin(playin->getAngle()) * PLAYER_BAR_SIZE);
-	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
 }
 
 void draw() {
 	drawMap(maps[mapIndex]);
-	drawPlayer(playin);
+	drawPlayer();
 }
 
 
@@ -92,27 +94,33 @@ void update() {
 	float posY = Input::GetVerticalAxis();
 	float zoom = Input::GetZoom();
 
-	playin->calculateAngle(posX, posY);
+	if (zoom) {
 
-	scale += zoom * deltaTime * ZOOM_PER_SECOND;
+		scale += zoom * deltaTime * ZOOM_PER_SECOND;
+		scale = std::max(SCALE_MIN, scale);
+		scale = std::min(scale, SCALE_MAX);
+	}
 	
+	if (!posX && !posY ) return; //si no hay movimiento no calcular cosas
+
+	playin->calculateAngle(posX, posY);
 	// Clamp
-	scale = std::max(SCALE_MIN, scale);
-	scale = std::min(scale, SCALE_MAX);
 
 	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * deltaTime;
 	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * deltaTime;
 	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
 	// ni en la de abajo del tile hay un tile
-	if (maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), playin->getPosY())
-		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), playin->getPosY() + (COLLISION_OFFSET * posX))
-		&& maps[mapIndex].isTransitable(nextX + (COLLISION_OFFSET * posX), playin->getPosY() + (COLLISION_OFFSET * -posX))) {
+	int tmpX = nextX + (COLLISION_OFFSET * posX);
+	if (maps[mapIndex].isTransitable(tmpX, playin->getPosY())
+		&& maps[mapIndex].isTransitable(tmpX, playin->getPosY() + (COLLISION_OFFSET * posX))
+		&& maps[mapIndex].isTransitable(tmpX, playin->getPosY() + (COLLISION_OFFSET * -posX))) {
 		playin->setPosX(nextX);
 	}
 	//te mueves en vertical similar a horizontal pero comprobaciones en la x
-	if (maps[mapIndex].isTransitable(playin->getPosX(), nextY + (COLLISION_OFFSET * posY)) &&
-		maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * posY), nextY + (COLLISION_OFFSET * posY))
-		&& maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * -posY), nextY + (COLLISION_OFFSET * posY))) {
+	int tmpY = nextY + (COLLISION_OFFSET * posY);
+	if (maps[mapIndex].isTransitable(playin->getPosX(), tmpY) &&
+		maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * posY), tmpY)
+		&& maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * -posY), tmpY)) {
 		playin->setPosY(nextY);
 	}
 }
@@ -132,7 +140,10 @@ int main(int argc, char* argv[])
 
 	lecturaMapa("assets/maps.pak");
 
-	while (Platform::Tick())
+	int cFrames = 0;
+	auto start = std::chrono::high_resolution_clock::now();
+
+	while (Platform::Tick() /*&& cFrames++ < 100*/)
 	{
 		Input::Tick();
 		update();
@@ -140,7 +151,10 @@ int main(int argc, char* argv[])
 		draw();
 		Renderer::Present();
 	}
-	
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	std::cout << cFrames / (duration.count() / 1000.0) << " FPS." << std::endl;
 
 	free();
 	Renderer::Release();

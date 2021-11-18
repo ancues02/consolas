@@ -25,8 +25,8 @@ private:
 	static std::vector<SDL_Listener*> _inputListeners;
 	
 	static double deltaTime;
-	static std::chrono::high_resolution_clock::time_point lastFrameTime;
-	static std::chrono::high_resolution_clock::time_point currentFrameTime;
+	static std::chrono::high_resolution_clock::time_point lastFrameMilli;
+	static std::chrono::high_resolution_clock::time_point currentFrameMilli;
 
 	static void notifyListeners(SDL_Event* evt);
 };

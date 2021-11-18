@@ -15,8 +15,8 @@
 std::map<const char*, FILE*> Platform::_fileMap;
 std::vector<SDL_Listener*> Platform::_inputListeners;
 double Platform::deltaTime;
-std::chrono::high_resolution_clock::time_point Platform::lastFrameTime = std::chrono::high_resolution_clock::now();
-std::chrono::high_resolution_clock::time_point Platform::currentFrameTime = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point Platform::lastFrameMilli = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point Platform::currentFrameMilli = std::chrono::high_resolution_clock::now();
 
 void Platform::Init()
 {
@@ -27,9 +27,9 @@ void Platform::Init()
 
 bool Platform::Tick()
 {
-	lastFrameTime = currentFrameTime;
-	currentFrameTime = std::chrono::high_resolution_clock::now();
-	deltaTime = (std::chrono::duration_cast<std::chrono::milliseconds>(currentFrameTime - lastFrameTime).count()) / 1000.0;
+	lastFrameMilli = currentFrameMilli;
+	currentFrameMilli = std::chrono::high_resolution_clock::now();
+	deltaTime = (std::chrono::duration_cast<std::chrono::milliseconds>(currentFrameMilli - lastFrameMilli).count()) / 1000.0;
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
