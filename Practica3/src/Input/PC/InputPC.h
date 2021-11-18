@@ -27,4 +27,7 @@ private:
 
 	// Referencia al teclado para toda la ejecucion
 	static const uint8_t* _keyboard;
+
+	// referencia al GamePad para toda la ejecución
+	static SDL_GameController* _controller;
 };

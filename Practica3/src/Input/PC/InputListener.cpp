@@ -31,6 +31,12 @@ void InputListener::notify(SDL_Event* evt)
 	case SDL_MOUSEBUTTONUP:
 		_inputInfo._mouseButtonEvent = true;
 		break;
+	case SDL_JOYAXISMOTION:
+		_inputInfo._joystickAxisEvent = true;
+		break;
+	case SDL_JOYBUTTONDOWN:
+		_inputInfo._joystickButtonEvent = true;
+		break;
 	}
 }
 
@@ -48,6 +54,8 @@ void InputListener::resetInfo()
 	_inputInfo._keyUpEvent = false;
 	_inputInfo._mouseButtonEvent = false;
 	_inputInfo._mouseMoveEvent = false;
+	_inputInfo._joystickAxisEvent = false;
+	_inputInfo._joystickButtonEvent = false;
 }
 
 #endif // PLATFORM_PC
