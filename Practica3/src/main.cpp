@@ -112,19 +112,19 @@ void update() {
 
 	if (zoom) {
 		scale += zoom * deltaTime * ZOOM_PER_SECOND;
-		scale = std::max(SCALE_MIN, scale);
-		scale = std::min(scale, SCALE_MAX);
+		clampf(scale,SCALE_MIN, SCALE_MAX);
 	}
 	
 	if (!posX && !posY ) return; //si no hay movimiento no calcular cosas
 
 	playin->calculateAngle(posX, posY);
-	// Clamp
 	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * deltaTime;
 	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * deltaTime;
 
 
 	//esto para comprobar el siguiente tile
+	// posX = roundAloAlto(posx) + roundAloBajo(posX)
+	
 	if (posX > 0)posX = 1;
 	else if (posX < 0) posX = -1;
 	if (posY > 0)posY = 1;
@@ -155,10 +155,7 @@ void free() {
 
 int main(int argc, char* argv[])
 {
-	if (!Platform::Init())
-		return -1;
-	Renderer::Init(false, 1920, 1080);
-	if (!Input::Init())
+	if (!Platform::Init() || !Renderer::Init(false, 1920, 1080) || !Input::Init())
 		return -1;
 
 	Renderer::ReadImage("assets/walls.pak");
@@ -170,8 +167,6 @@ int main(int argc, char* argv[])
 
 	createPlayer();
 
-	int cFrames = 0;
-	auto start = std::chrono::high_resolution_clock::now();
 
 	while (Platform::Tick() /*&& cFrames++ < 100*/)
 	{
@@ -180,13 +175,9 @@ int main(int argc, char* argv[])
 		Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
 		draw();
 		Renderer::Present();
-		std::cout << 1 / Platform::getDeltaTime() << std::endl;
 	}
 
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-	std::cout << cFrames / (duration.count() / 1000.0) << " FPS." << std::endl;
-
+	
 	free();
 	Renderer::Release();
 	Platform::Release();

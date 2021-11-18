@@ -1,6 +1,6 @@
 #pragma once
 
-const unsigned int PLAYER_SIZE = 10;//5;
+const unsigned int PLAYER_SIZE = 5;
 const unsigned int PLAYER_BAR_SIZE = 25;//10;
 
 class Player {

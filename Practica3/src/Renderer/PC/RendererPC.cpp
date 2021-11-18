@@ -128,14 +128,14 @@ void Renderer::Present()
 	SDL_RenderPresent(_renderer);
 }
 
-void Renderer::ReadImage(const char* name) {
+bool Renderer::ReadImage(const char* name) {
 	bool bigEndian = Platform::IsBigEndian();
 
 	FILE* file = Platform::OpenFile(name, "rb");
 
-	if (file == nullptr) return; // Ha fallado la carga
+	if (file == nullptr) return false; // Ha fallado la carga
 	int w, h, num;
-	if (fread(&num, 4, 1, file) == 0) return;
+	if (fread(&num, 4, 1, file) == 0) return false;
 	if (!bigEndian) 
 		num = FLIPENDIAN_32((int)num);
 
@@ -168,6 +168,8 @@ void Renderer::ReadImage(const char* name) {
 			//ERRATA 2 bytes en mapa y antes hay 16 bytes con el nombre del mapa terminado en \0
 			// si queremos ver las tripas del fichero cambiar a .bin y abrir con visual
 	}
+
+	return true;
 }
 
 Image* Renderer::GetImage(int index) {

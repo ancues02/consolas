@@ -19,7 +19,7 @@ public:
 	static int GetWidth() { return _width; }
 	static int GetHeight() { return _height; }
 	//P3
-	static void ReadImage(const char* name);
+	static bool ReadImage(const char* name);
 	static Image* GetImage(int index);
 
 private:
