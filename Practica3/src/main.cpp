@@ -96,12 +96,10 @@ void drawPlayer() {
 		{ 255, 255, 0, 0 });
 }
 
-
 void draw() {
 	drawMap(maps[mapIndex]);
 	drawPlayer();
 }
-
 
 void update() {
 	double deltaTime = Platform::getDeltaTime();
@@ -120,7 +118,6 @@ void update() {
 	playin->calculateAngle(posX, posY);
 	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * deltaTime;
 	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * deltaTime;
-
 
 	//esto para comprobar el siguiente tile
 	// posX = roundAloAlto(posx) + roundAloBajo(posX)
@@ -152,10 +149,9 @@ void free() {
 	delete playin;
 }
 
-
 int main(int argc, char* argv[])
 {
-	if (!Platform::Init() || !Renderer::Init(false, 1920, 1080) || !Input::Init())
+	if (!Platform::Init() || !Renderer::Init(false, 1280, 720) || !Input::Init())
 		return -1;
 
 	Renderer::ReadImage("assets/walls.pak");

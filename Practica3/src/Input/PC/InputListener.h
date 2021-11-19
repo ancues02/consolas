@@ -10,8 +10,8 @@ struct InputInfo
 	bool _keyDownEvent = false;
 	bool _mouseMoveEvent = false;
 	bool _mouseButtonEvent = false;
-	bool _joystickAxisEvent = false;
-	bool _joystickButtonEvent = false;
+	bool _controllerConnected = false;
+	bool _controllerDisconnected = false;
 };
 
 /*

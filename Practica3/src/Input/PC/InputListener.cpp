@@ -31,11 +31,11 @@ void InputListener::notify(SDL_Event* evt)
 	case SDL_MOUSEBUTTONUP:
 		_inputInfo._mouseButtonEvent = true;
 		break;
-	case SDL_JOYAXISMOTION:
-		_inputInfo._joystickAxisEvent = true;
+	case SDL_CONTROLLERDEVICEADDED:
+		_inputInfo._controllerConnected = true;
 		break;
-	case SDL_JOYBUTTONDOWN:
-		_inputInfo._joystickButtonEvent = true;
+	case SDL_CONTROLLERDEVICEREMOVED:
+		_inputInfo._controllerDisconnected = true;
 		break;
 	}
 }
@@ -44,7 +44,7 @@ InputInfo InputListener::getFrameInfo()
 {
 	InputInfo frameInfo = _inputInfo;
 	// TODO: esto deberia de resetearse pero va peor
-	//resetInfo();
+	resetInfo();
 	return frameInfo;
 }
 
@@ -54,8 +54,6 @@ void InputListener::resetInfo()
 	_inputInfo._keyUpEvent = false;
 	_inputInfo._mouseButtonEvent = false;
 	_inputInfo._mouseMoveEvent = false;
-	_inputInfo._joystickAxisEvent = false;
-	_inputInfo._joystickButtonEvent = false;
 }
 
 #endif // PLATFORM_PC

@@ -26,55 +26,72 @@ bool Input::Init()
 void Input::Tick()
 {
 	_frameInfo = _inputListener.getFrameInfo();
+
+	if (_frameInfo._controllerConnected) {
+		_controller = SDL_GameControllerOpen(0);
+	}
+	if (_frameInfo._controllerDisconnected && SDL_NumJoysticks() > 1) {
+		if (SDL_NumJoysticks() > 1) 
+			_controller = SDL_GameControllerOpen(0);
+		else 
+			_controller = nullptr;
+	}
 }
 
 void Input::Release()
 {
+	delete _keyboard;
+	delete _controller;
 }
 
 float Input::GetVerticalAxis()
 {
-	int ret = 0;
-	if (_frameInfo._keyDownEvent) {
-		if (_keyboard[SDL_SCANCODE_W])
-			ret--;
-		if (_keyboard[SDL_SCANCODE_S])
-			ret++;
+	float ret = 0;
+
+	ret -= _keyboard[SDL_SCANCODE_W];
+	ret += _keyboard[SDL_SCANCODE_S];
+
+	if (_controller) {
+		float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTY);
+		float maxAxis = SDL_JOYSTICK_AXIS_MAX;
+		float tAxis = cAxis / maxAxis;
+		if (abs(tAxis) > JOYSTICK_DEADZONE) 
+			ret += tAxis;
 	}
-	if (_frameInfo._joystickAxisEvent) {
-		ret += (SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTX) / (float)SDL_JOYSTICK_AXIS_MAX);
-	}
+	clampf(ret, -1, 1);
 	return ret;
 }
 
 float Input::GetHorizontalAxis()
 {
-	int ret = 0;
-	if (_frameInfo._keyDownEvent) {
-		if (_keyboard[SDL_GetScancodeFromKey(SDLK_a)])
-			ret--;
-		if (_keyboard[SDL_GetScancodeFromKey(SDLK_d)])
-			ret++;
+	float ret = 0;
+
+	ret -= _keyboard[SDL_GetScancodeFromKey(SDLK_a)];
+	ret += _keyboard[SDL_GetScancodeFromKey(SDLK_d)];
+
+	if (_controller) {
+		float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTX);
+		float maxAxis = SDL_JOYSTICK_AXIS_MAX;
+		float tAxis = cAxis / maxAxis;
+		if (abs(tAxis) > JOYSTICK_DEADZONE)
+			ret += tAxis;
 	}
-	if (_frameInfo._joystickAxisEvent) {
-		ret += (SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTY) / (float)SDL_JOYSTICK_AXIS_MAX);
-	}
+	clampf(ret, -1, 1);
 	return ret;
 }
 
 int Input::GetZoom()
 {
-	int ret = 0;
-	if (_frameInfo._keyDownEvent) {
-		if (_keyboard[SDL_GetScancodeFromKey(SDLK_SPACE)])
-			ret--;
-		if (_keyboard[SDL_GetScancodeFromKey(SDLK_RETURN)])
-			ret++;
-	}
-	if (_frameInfo._joystickAxisEvent) {
+	float ret = 0;
+
+	ret -= _keyboard[SDL_GetScancodeFromKey(SDLK_SPACE)];
+	ret += _keyboard[SDL_GetScancodeFromKey(SDLK_RETURN)];
+
+	if (_controller) {
 		ret += SDL_GameControllerGetButton(_controller, SDL_CONTROLLER_BUTTON_A);
 		ret -= SDL_GameControllerGetButton(_controller, SDL_CONTROLLER_BUTTON_B);
 	}
+	clampf(ret, -1, 1);
 	return ret;
 }
 

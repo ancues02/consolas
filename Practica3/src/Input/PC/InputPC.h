@@ -2,6 +2,8 @@
 #include "../../Utils.h"
 #include "InputListener.h"
 
+const float JOYSTICK_DEADZONE = 0.25f;
+
 class Input{
 public:
 	enum MouseState : uint8_t {
