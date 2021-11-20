@@ -12,7 +12,8 @@ struct InputInfo
 	bool _mouseButtonEvent = false;
 	bool _controllerConnected = false;
 	bool _controllerDisconnected = false;
-	Sint32 _controllerId = -1;
+	Sint32 _controllerCId = -1;
+	Sint32 _controllerDId = -1;
 };
 
 /*

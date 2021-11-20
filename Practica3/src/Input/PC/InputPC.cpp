@@ -6,18 +6,12 @@ InputListener Input::_inputListener;
 InputInfo Input::_frameInfo;
 const uint8_t* Input::_keyboard = nullptr;
 SDL_GameController* Input::_controller = nullptr;
+int32_t Input::_currentController;
 
 bool Input::Init()
 {
     // Referencia al teclado para toda la ejecucion
     _keyboard = SDL_GetKeyboardState(0);
-
-    // Primer controller encontrado
-    for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-        if (SDL_IsGameController(i)) {
-            _controller = SDL_GameControllerOpen(i);
-        }
-    }
 
     // Ponemos a escuchar los eventos a nuestro listener
     Platform::addInputListener(&_inputListener);
@@ -29,21 +23,23 @@ void Input::Tick()
 {
     _frameInfo = _inputListener.getFrameInfo();
 
-    if (_frameInfo._controllerConnected && !_controller) {
-        _controller = SDL_GameControllerOpen(_frameInfo._controllerId);
+    if (_frameInfo._controllerConnected) {  // Último mando conectado
+        if (_controller) SDL_GameControllerClose(_controller);  // Se cierra el anterior activo
+        _controller = SDL_GameControllerOpen(_frameInfo._controllerCId);
+        _currentController = _frameInfo._controllerCId;
     }
-    if (_frameInfo._controllerDisconnected) {
-        SDL_GameControllerClose(_controller);
-        _controller = nullptr;
-        if (SDL_NumJoysticks() > 1)
-            _controller = SDL_GameControllerOpen(0);     
+    if (_frameInfo._controllerDisconnected) { 
+        if (_currentController == _frameInfo._controllerDId) {  // Si era el current lo cierra
+            SDL_GameControllerClose(_controller);   
+            _controller = SDL_GameControllerOpen(0);            // y por defecto coge el 0
+        }
     }
 }
 
 void Input::Release()
 {
     delete _keyboard;
-    delete _controller;
+    if(_controller) SDL_GameControllerClose(_controller);
 }
 
 float Input::GetVerticalAxis()

@@ -32,4 +32,5 @@ private:
 
 	// referencia al GamePad para toda la ejecución
 	static SDL_GameController* _controller;
+	static int32_t _currentController;
 };
