@@ -116,8 +116,8 @@ void update() {
 	if (!posX && !posY ) return; //si no hay movimiento no calcular cosas
 
 	playin->calculateAngle(posX, posY);
-	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * deltaTime;
-	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * deltaTime;
+	float realNextX = playin->getPosX() + (float)posX * TILES_PER_SECOND * deltaTime;
+	float realNextY = playin->getPosY() + (float)posY * TILES_PER_SECOND * deltaTime;
 
 	//esto para comprobar el siguiente tile
 	// posX = roundAloAlto(posx) + roundAloBajo(posX)
@@ -126,21 +126,24 @@ void update() {
 	else if (posX < 0) posX = -1;
 	if (posY > 0)posY = 1;
 	else if (posY < 0) posY = -1;
+	float nextX = playin->getPosX() + (float)posX * TILES_PER_SECOND * deltaTime;
+	float nextY = playin->getPosY() + (float)posY * TILES_PER_SECOND * deltaTime;
+
 
 	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
 	// ni en la de abajo del tile hay un tile
-	int tmpX = nextX + (COLLISION_OFFSET * posX);
+	int tmpX = std::floorf(nextX + (COLLISION_OFFSET * posX));
 	if (maps[mapIndex].isTransitable(tmpX, playin->getPosY())
 		&& maps[mapIndex].isTransitable(tmpX, playin->getPosY() + (COLLISION_OFFSET * posX))
 		&& maps[mapIndex].isTransitable(tmpX, playin->getPosY() + (COLLISION_OFFSET * -posX))) {
-		playin->setPosX(nextX);
+		playin->setPosX(realNextX);
 	}
 	//te mueves en vertical similar a horizontal pero comprobaciones en la x
-	int tmpY = nextY + (COLLISION_OFFSET * posY);
+	int tmpY = std::floorf(nextY + (COLLISION_OFFSET * posY));
 	if (maps[mapIndex].isTransitable(playin->getPosX(), tmpY) &&
 		maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * posY), tmpY)
 		&& maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * -posY), tmpY)) {
-		playin->setPosY(nextY);
+		playin->setPosY(realNextY);
 	}
 }
 

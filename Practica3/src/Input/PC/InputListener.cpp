@@ -31,10 +31,11 @@ void InputListener::notify(SDL_Event* evt)
 	case SDL_MOUSEBUTTONUP:
 		_inputInfo._mouseButtonEvent = true;
 		break;
-	case SDL_CONTROLLERDEVICEADDED:
+	case SDL_JOYDEVICEADDED:
 		_inputInfo._controllerConnected = true;
+		_inputInfo._controllerId = evt->cdevice.which;
 		break;
-	case SDL_CONTROLLERDEVICEREMOVED:
+	case SDL_JOYDEVICEREMOVED:
 		_inputInfo._controllerDisconnected = true;
 		break;
 	}
@@ -56,6 +57,7 @@ void InputListener::resetInfo()
 	_inputInfo._mouseMoveEvent = false;
 	_inputInfo._controllerConnected = false;
 	_inputInfo._controllerDisconnected = false;
+	_inputInfo._controllerId = -1;
 }
 
 #endif // PLATFORM_PC

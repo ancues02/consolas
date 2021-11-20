@@ -9,75 +9,77 @@ SDL_GameController* Input::_controller = nullptr;
 
 bool Input::Init()
 {
-	// Referencia al teclado para toda la ejecucion
-	_keyboard = SDL_GetKeyboardState(0);
+    // Referencia al teclado para toda la ejecucion
+    _keyboard = SDL_GetKeyboardState(0);
 
-	// Primer controller encontrado
-	if (SDL_NumJoysticks() > 1) {
-		_controller = SDL_GameControllerOpen(0);
-	}
-	
-	// Ponemos a escuchar los eventos a nuestro listener
-	Platform::addInputListener(&_inputListener);
+    // Primer controller encontrado
+    for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+        if (SDL_IsGameController(i)) {
+            _controller = SDL_GameControllerOpen(i);
+        }
+    }
 
-	return true;
+    // Ponemos a escuchar los eventos a nuestro listener
+    Platform::addInputListener(&_inputListener);
+
+    return true;
 }
 
 void Input::Tick()
 {
-	_frameInfo = _inputListener.getFrameInfo();
+    _frameInfo = _inputListener.getFrameInfo();
 
-	if (_frameInfo._controllerConnected) {
-		_controller = SDL_GameControllerOpen(0);
-	}
-	if (_frameInfo._controllerDisconnected) {
-		if (SDL_NumJoysticks() > 1) 
-			_controller = SDL_GameControllerOpen(0);
-		else 
-			_controller = nullptr;
-	}
+    if (_frameInfo._controllerConnected && !_controller) {
+        _controller = SDL_GameControllerOpen(_frameInfo._controllerId);
+    }
+    if (_frameInfo._controllerDisconnected) {
+        SDL_GameControllerClose(_controller);
+        _controller = nullptr;
+        if (SDL_NumJoysticks() > 1)
+            _controller = SDL_GameControllerOpen(0);     
+    }
 }
 
 void Input::Release()
 {
-	delete _keyboard;
-	delete _controller;
+    delete _keyboard;
+    delete _controller;
 }
 
 float Input::GetVerticalAxis()
 {
-	float ret = 0;
+    float ret = 0;
 
-	ret -= _keyboard[SDL_SCANCODE_W];
-	ret += _keyboard[SDL_SCANCODE_S];
+    ret -= _keyboard[SDL_SCANCODE_W];
+    ret += _keyboard[SDL_SCANCODE_S];
 
-	if (_controller) {
-		float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTY);
-		float maxAxis = SDL_JOYSTICK_AXIS_MAX;
-		float tAxis = cAxis / maxAxis;
-		if (abs(tAxis) > JOYSTICK_DEADZONE) 
-			ret += tAxis;
-	}
-	clampf(ret, -1, 1);
-	return ret;
+    if (_controller) {
+        float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTY);
+        float maxAxis = SDL_JOYSTICK_AXIS_MAX;
+        float tAxis = cAxis / maxAxis;
+        if (abs(tAxis) > JOYSTICK_DEADZONE)
+            ret += tAxis;
+    }
+    clampf(ret, -1, 1);
+    return ret;
 }
 
 float Input::GetHorizontalAxis()
 {
-	float ret = 0;
+    float ret = 0;
 
-	ret -= _keyboard[SDL_GetScancodeFromKey(SDLK_a)];
-	ret += _keyboard[SDL_GetScancodeFromKey(SDLK_d)];
+    ret -= _keyboard[SDL_GetScancodeFromKey(SDLK_a)];
+    ret += _keyboard[SDL_GetScancodeFromKey(SDLK_d)];
 
-	if (_controller) {
-		float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTX);
-		float maxAxis = SDL_JOYSTICK_AXIS_MAX;
-		float tAxis = cAxis / maxAxis;
-		if (abs(tAxis) > JOYSTICK_DEADZONE)
-			ret += tAxis;
-	}
-	clampf(ret, -1, 1);
-	return ret;
+    if (_controller) {
+        float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTX);
+        float maxAxis = SDL_JOYSTICK_AXIS_MAX;
+        float tAxis = cAxis / maxAxis;
+        if (abs(tAxis) > JOYSTICK_DEADZONE)
+            ret += tAxis;
+    }
+    clampf(ret, -1, 1);
+    return ret;
 }
 
 int Input::GetZoom()

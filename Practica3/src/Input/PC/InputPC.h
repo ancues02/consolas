@@ -2,7 +2,7 @@
 #include "../../Utils.h"
 #include "InputListener.h"
 
-const float JOYSTICK_DEADZONE = 0.25f;
+const float JOYSTICK_DEADZONE = 0.13f;
 
 class Input{
 public:
