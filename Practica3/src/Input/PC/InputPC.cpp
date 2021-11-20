@@ -24,14 +24,22 @@ void Input::Tick()
     _frameInfo = _inputListener.getFrameInfo();
 
     if (_frameInfo._controllerConnected) {  // Último mando conectado
-        if (_controller) SDL_GameControllerClose(_controller);  // Se cierra el anterior activo
-        _controller = SDL_GameControllerOpen(_frameInfo._controllerCId);
-        _currentController = _frameInfo._controllerCId;
+        if (!_controller) {
+            _controller = SDL_GameControllerOpen(_frameInfo._controllerCId);
+            _currentController = _frameInfo._controllerCId;
+        }
     }
     if (_frameInfo._controllerDisconnected) { 
         if (_currentController == _frameInfo._controllerDId) {  // Si era el current lo cierra
-            SDL_GameControllerClose(_controller);   
-            _controller = SDL_GameControllerOpen(0);            // y por defecto coge el 0
+            SDL_GameControllerClose(_controller);         
+            _controller = nullptr;
+            _currentController = -1;
+            for (int i = 0; i < SDL_NumJoysticks(); ++i) {  // y por defecto coge el primero que encuentre
+                _controller = SDL_GameControllerOpen(i);
+                _currentController = i;
+            }
+                       
+            //_currentController = SDL_getcontroller;
         }
     }
 }
