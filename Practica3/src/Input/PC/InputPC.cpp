@@ -50,40 +50,41 @@ void Input::Release()
     if(_controller) SDL_GameControllerClose(_controller);
 }
 
-float Input::GetVerticalAxis()
-{
-    float ret = 0;
+void Input::GetAxis(float& horizontal, float& vertical) {
+    vertical = horizontal = 0;
 
-    ret -= _keyboard[SDL_SCANCODE_W];
-    ret += _keyboard[SDL_SCANCODE_S];
+    vertical -= _keyboard[SDL_SCANCODE_W];
+    vertical += _keyboard[SDL_SCANCODE_S];
 
+    horizontal -= _keyboard[SDL_GetScancodeFromKey(SDLK_a)];
+    horizontal += _keyboard[SDL_GetScancodeFromKey(SDLK_d)];
+
+    float vCont = 0;
     if (_controller) {
         float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTY);
         float maxAxis = SDL_JOYSTICK_AXIS_MAX;
         float tAxis = cAxis / maxAxis;
-        if (abs(tAxis) > JOYSTICK_DEADZONE)
-            ret += tAxis;
+        vCont += tAxis;
     }
-    clampf(ret, -1, 1);
-    return ret;
-}
 
-float Input::GetHorizontalAxis()
-{
-    float ret = 0;
-
-    ret -= _keyboard[SDL_GetScancodeFromKey(SDLK_a)];
-    ret += _keyboard[SDL_GetScancodeFromKey(SDLK_d)];
-
+    float hCont = 0;
     if (_controller) {
         float cAxis = (float)SDL_GameControllerGetAxis(_controller, SDL_CONTROLLER_AXIS_LEFTX);
         float maxAxis = SDL_JOYSTICK_AXIS_MAX;
         float tAxis = cAxis / maxAxis;
-        if (abs(tAxis) > JOYSTICK_DEADZONE)
-            ret += tAxis;
+        hCont += tAxis;
     }
-    clampf(ret, -1, 1);
-    return ret;
+
+    if (abs(hCont) < JOYSTICK_DEADZONE && abs(vCont) < JOYSTICK_DEADZONE) 
+    {
+        hCont = vCont = 0;
+    }
+
+    horizontal += hCont;
+    vertical += vCont;
+
+    clampf(vertical, -1, 1);
+    clampf(horizontal, -1, 1);
 }
 
 int Input::GetZoom()

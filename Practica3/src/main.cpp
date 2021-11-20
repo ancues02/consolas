@@ -104,8 +104,8 @@ void draw() {
 void update() {
 	double deltaTime = Platform::getDeltaTime();
 
-	float posX = Input::GetHorizontalAxis();
-	float posY = Input::GetVerticalAxis();
+	float posX, posY;
+	Input::GetAxis(posX, posY);
 	float zoom = Input::GetZoom();
 
 	if (zoom) {
