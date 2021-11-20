@@ -54,6 +54,8 @@ void InputListener::resetInfo()
 	_inputInfo._keyUpEvent = false;
 	_inputInfo._mouseButtonEvent = false;
 	_inputInfo._mouseMoveEvent = false;
+	_inputInfo._controllerConnected = false;
+	_inputInfo._controllerDisconnected = false;
 }
 
 #endif // PLATFORM_PC

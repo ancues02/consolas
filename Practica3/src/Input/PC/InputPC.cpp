@@ -30,7 +30,7 @@ void Input::Tick()
 	if (_frameInfo._controllerConnected) {
 		_controller = SDL_GameControllerOpen(0);
 	}
-	if (_frameInfo._controllerDisconnected && SDL_NumJoysticks() > 1) {
+	if (_frameInfo._controllerDisconnected) {
 		if (SDL_NumJoysticks() > 1) 
 			_controller = SDL_GameControllerOpen(0);
 		else 
