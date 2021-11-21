@@ -1,5 +1,6 @@
 #pragma once
 
+const float PLAYER_SPEED = 3.0f;
 const unsigned int PLAYER_SIZE = 5;
 const unsigned int PLAYER_BAR_SIZE = 25;//10;
 
