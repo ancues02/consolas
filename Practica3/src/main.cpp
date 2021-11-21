@@ -116,8 +116,8 @@ void update() {
 	if (!posX && !posY ) return; //si no hay movimiento no calcular cosas
 
 	playin->calculateAngle(posX, posY);
-	float realNextX = playin->getPosX() + (float)posX * TILES_PER_SECOND * deltaTime;
-	float realNextY = playin->getPosY() + (float)posY * TILES_PER_SECOND * deltaTime;
+	float realNextX = playin->getPosX() + posX * TILES_PER_SECOND * (float)deltaTime;
+	float realNextY = playin->getPosY() + posY * TILES_PER_SECOND * (float)deltaTime;
 
 	//esto para comprobar el siguiente tile
 	// posX = roundAloAlto(posx) + roundAloBajo(posX)
@@ -126,8 +126,8 @@ void update() {
 	else if (posX < 0) posX = -1;
 	if (posY > 0)posY = 1;
 	else if (posY < 0) posY = -1;
-	float nextX = playin->getPosX() + (float)posX * TILES_PER_SECOND * deltaTime;
-	float nextY = playin->getPosY() + (float)posY * TILES_PER_SECOND * deltaTime;
+	float nextX = playin->getPosX() + posX * TILES_PER_SECOND * (float)deltaTime;
+	float nextY = playin->getPosY() + posY * TILES_PER_SECOND * (float)deltaTime;
 
 
 	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile

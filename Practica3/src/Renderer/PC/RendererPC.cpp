@@ -111,7 +111,8 @@ void Renderer::DrawCircle(int cx, int cy, int rad, const Color& c)
 }
 
 void Renderer::DrawImage(const Image &img, int x1, int y1, int x2, int y2) {
-	SDL_RenderCopy(_renderer, img.getTexture(), NULL, new SDL_Rect{x1, y1, x2, y2});
+	SDL_Rect r = SDL_Rect{ x1, y1, x2, y2 };
+	SDL_RenderCopy(_renderer, img.getTexture(), NULL, &r);
 }
 
 void Renderer::DrawRect(int x, int y, int w, int h, const Color& c)
