@@ -82,8 +82,8 @@ void Game::update() {
 	if (!posX && !posY) return; //si no hay movimiento no calcular cosas
 
 	playin->calculateAngle(posX, posY);
-	float realNextX = playin->getPosX() + posX * PLAYER_SPEED * deltaTime;
-	float realNextY = playin->getPosY() + posY * PLAYER_SPEED * deltaTime;
+	float realNextX = playin->getPosX() + posX * playin->getSpeed() * deltaTime;
+	float realNextY = playin->getPosY() + posY * playin->getSpeed() * deltaTime;
 
 	//esto para comprobar el siguiente tile
 	// posX = roundAloAlto(posx) + roundAloBajo(posX)
@@ -92,8 +92,8 @@ void Game::update() {
 	else if (posX < 0) posX = -1;
 	if (posY > 0)posY = 1;
 	else if (posY < 0) posY = -1;
-	float nextX = playin->getPosX() + posX * PLAYER_SPEED * deltaTime;
-	float nextY = playin->getPosY() + posY * PLAYER_SPEED * deltaTime;
+	float nextX = playin->getPosX() + posX * playin->getSpeed() * deltaTime;
+	float nextY = playin->getPosY() + posY * playin->getSpeed() * deltaTime;
 
 
 	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
@@ -130,15 +130,15 @@ void Game::drawMap(const Map& map) {
 void Game::drawPlayer()
 {
 	// Línea
-	int contactX = (Renderer::GetWidth() / 2) + (cos(playin->getAngle()) * PLAYER_BAR_SIZE);
-	int contactY = (Renderer::GetHeight() / 2) + (sin(playin->getAngle()) * PLAYER_BAR_SIZE);
+	int contactX = (Renderer::GetWidth() / 2) + (cos(playin->getAngle()) * playin->getBarSize());
+	int contactY = (Renderer::GetHeight() / 2) + (sin(playin->getAngle()) * playin->getBarSize());
 	Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, contactX, contactY, { 255, 255, 255, 255 });
 
 	// Jugador
-	Renderer::DrawRect((Renderer::GetWidth() / 2) - (PLAYER_SIZE / 2),
-		(Renderer::GetHeight() / 2) - (PLAYER_SIZE / 2),
-		PLAYER_SIZE,
-		PLAYER_SIZE,
+	Renderer::DrawRect((Renderer::GetWidth() / 2) - (playin->getSize() / 2),
+		(Renderer::GetHeight() / 2) - (playin->getSize() / 2),
+		playin->getSize(),
+		playin->getSize(),
 		{ 255, 255, 0, 0 });
 }
 
