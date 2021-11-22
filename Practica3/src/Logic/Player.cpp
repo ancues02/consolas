@@ -11,6 +11,10 @@ void Player::setPosY(float pY) {
 	posY = pY;
 }
 
+void Player::setAngle(float angly) {
+	angle = angly;
+}
+
 void Player::calculateAngle(float dX, float dY) {
 	if (dX != 0 || dY != 0) angle = atan2(dY, dX);
 }

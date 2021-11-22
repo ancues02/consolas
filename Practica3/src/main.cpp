@@ -13,10 +13,9 @@ int main(int argc, char* argv[])
 		return -1;
 
 	Game game;
-	if (!Renderer::ReadImage("assets/walls.pak") || !game.loadMaps("assets/maps.pak"))
+	if (!Renderer::ReadImage("assets/walls.pak") || !game.Init("assets/maps.pak", 0))
 		return -1;
 
-	game.setMap(0);
 	while (Platform::Tick() /*&& cFrames++ < 100*/)
 	{
 		Input::Tick();

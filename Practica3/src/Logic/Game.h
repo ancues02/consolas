@@ -18,8 +18,9 @@ public:
 	 *
 	 * Devuelve false si ha encontrado un error, lectura del fichero o lectura de un mapa
 	 */
+	bool Init(const char* map, int index);
 	bool loadMaps(const char* fileName);
-	void setMap(int indx);
+	bool setMap(int indx);
 	void setScaleLimits(float MinScale, float MaxScale);
 	void update();
 	void draw();

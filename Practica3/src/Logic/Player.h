@@ -1,6 +1,5 @@
 #pragma once
 
-
 class Player {
 public:
 	Player(float X, float Y, float A);
@@ -11,6 +10,7 @@ public:
 	void setPosY(float pY);
 
 	float getAngle() const;
+	void setAngle(float angle);
 	void calculateAngle(float dX, float dY);
 
 	float getSpeed() const;

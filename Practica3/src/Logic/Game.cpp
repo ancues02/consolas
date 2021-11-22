@@ -18,13 +18,17 @@ Game::~Game()
 	free();
 }
 
-
-
 void Game::draw() {
 	drawMap(maps[mapIndex]);
 	drawPlayer();
 }
 
+bool Game::Init(const char* map, int index) {
+	if (!loadMaps(map)) return false;
+	playin = new Player(0, 0, 0);
+	if (!setMap(index)) return false;
+	return true;
+}
 
 bool Game::loadMaps(const char* fileName)
 {
@@ -47,18 +51,21 @@ bool Game::loadMaps(const char* fileName)
 	}
 	if (!loaded) return false;
 
-
 	return true;
 }
 
-void Game::setMap(int indx)
+bool Game::setMap(int indx)
 {
 	if (indx >= 0 && indx < numMaps) {
 		mapIndex = indx;
 		int sp = maps[mapIndex].getPlayerSpawnPoint();
 		int dir = maps[mapIndex].getPlayerOrientation() % 19;
-		playin = new Player((sp % TILE_SIZE) + 0.5f, (sp / TILE_SIZE) + 0.5f, DEG_RAD(((dir * 90) - 90)));
+		playin->setPosX((sp % TILE_SIZE) + 0.5f);
+		playin->setPosY((sp / TILE_SIZE) + 0.5f);
+		playin->setAngle(DEG_RAD(((dir * 90) - 90)));
+		return true;
 	}
+	else return false;
 }
 
 void Game::setScaleLimits(float MinScale, float MaxScale)
@@ -70,8 +77,8 @@ void Game::setScaleLimits(float MinScale, float MaxScale)
 void Game::update() {
 	double deltaTime = Platform::getDeltaTime();
 
-	float posX = Input::GetHorizontalAxis();
-	float posY = Input::GetVerticalAxis();
+	float posX, posY;
+	Input::GetAxis(posX, posY);
 	float zoom = Input::GetZoom();
 
 	if (zoom) {
