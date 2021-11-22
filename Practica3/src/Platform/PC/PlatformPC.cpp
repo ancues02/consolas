@@ -65,12 +65,10 @@ FILE* Platform::OpenFile(const char *name, const char *flags)
 	return file;
 }
 
-//TODO: Error handling 
 void Platform::CloseFile(const char *name)
 {
 	auto file_it = _fileMap.find(name);
 	if (file_it == _fileMap.end()) {
-		//ERRROR
 		std::cerr << "Error, no existe el mapa " << name << std::endl;
 	}
 	else {
