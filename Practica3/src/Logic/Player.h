@@ -14,18 +14,16 @@ public:
 	void calculateAngle(float dX, float dY);
 
 	float getSpeed() const;
-	void setSpeed(float sp);
 
 	unsigned int getSize() const;
-	void setSize(unsigned int s);
 
 	unsigned int getBarSize() const;
-	void setBarSize(unsigned int s);
 
 private:
+	const float PLAYERSPEED = 3; // tiles por segundo
+	const unsigned int PLAYERSIZE = 5;
+	const unsigned int PLAYERBARSIZE = 25;
+
 	float posX = 0, posY = 0;
 	float angle = 0;
-	float speed = 3; // tiles por segundo
-	unsigned int playerSize = 5;
-	unsigned int playerBarSize = 25;
 };

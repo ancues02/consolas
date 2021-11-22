@@ -1,21 +1,9 @@
 #include "Map.h"
 #include "../Utils.h"
 
-Map::Map(int width, int heigth, int nameSize) :
-	_width(width),
-	_heigth(heigth),
-	_size(width * heigth),
-	_nameSize(nameSize),
-	_mapInfo(nullptr),
-	_name(nullptr),
-	_playerStart(nullptr)
+Map::Map()
 {
 }
-
-Map::Map() : Map(64, 64, 16)
-{
-}
-
 
 Map::~Map()
 {
@@ -27,13 +15,13 @@ bool Map::load(FILE* file, bool bigEndian)
 	if (file == nullptr) return false;
 
 	uint16_t tile = 0;
-	int size = _width * _heigth;
+	int size = MAPWIDTH * MAPHEIGHT;
 
-	_name = new char[_nameSize];
+	_name = new char[MAPNAMESIZE];
 	_mapInfo = new uint16_t[size];
 	_playerStart = new uint16_t[2];
 
-	if (fread(_name, _nameSize, 1, file) == 0) return false;
+	if (fread(_name, MAPNAMESIZE, 1, file) == 0) return false;
 
 	//primer plano, informacion del nivel (paredes)
 	for (int y = 0; y < size; ++y) {
@@ -59,17 +47,17 @@ bool Map::load(FILE* file, bool bigEndian)
 
 int Map::getSize() const
 {
-	return _width * _heigth;
+	return MAPWIDTH * MAPHEIGHT;
 }
 
 int Map::getWidth() const
 {
-	return _width;
+	return MAPWIDTH;
 }
 
 int Map::getHeight() const
 {
-	return _heigth;
+	return MAPHEIGHT;
 }
 
 const char* Map::getName() const
@@ -79,7 +67,7 @@ const char* Map::getName() const
 
 bool Map::isTransitable(int x, int y) const
 {
-	return getTile(x + y * _width) < 1 || getTile(x + y * _width) > 63;
+	return getTile(x + y * MAPWIDTH) < 1 || getTile(x + y * MAPWIDTH) > 63;
 }
 
 uint16_t Map::getPlayerSpawnPoint() const
@@ -94,7 +82,7 @@ uint16_t Map::getPlayerOrientation() const
 
 uint16_t Map::getTile(int i) const
 {
-	if (i >= 0 && i < _size)
+	if (i >= 0 && i < MAPSIZE)
 		return _mapInfo[i];
 	return 0;
 }

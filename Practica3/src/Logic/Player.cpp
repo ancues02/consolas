@@ -21,32 +21,17 @@ void Player::calculateAngle(float dX, float dY) {
 
 float Player::getSpeed() const
 {
-	return speed;
-}
-
-void Player::setSpeed(float sp)
-{
-	speed = sp;
+	return PLAYERSPEED;
 }
 
 unsigned int Player::getSize() const
 {
-	return playerSize;
-}
-
-void Player::setSize(unsigned int s)
-{
-	playerSize = s;
+	return PLAYERSIZE;
 }
 
 unsigned int Player::getBarSize() const
 {
-	return playerBarSize;
-}
-
-void Player::setBarSize(unsigned int s)
-{
-	playerBarSize = s;
+	return PLAYERBARSIZE;
 }
 
 float Player::getPosX() const {

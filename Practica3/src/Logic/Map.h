@@ -48,25 +48,25 @@ public:
 private:
 
 	// Ancho del mapa
-	int _width;
+	const int MAPWIDTH = 64;
 
 	// Alto del mapa
-	int _heigth;
+	const int MAPHEIGHT = 64;
 
 	// Tamaño total del mapa
-	int _size;
+	const int MAPSIZE = MAPWIDTH * MAPHEIGHT;
 
 	// Longitud del nombre
-	int _nameSize;
+	const int MAPNAMESIZE = 16;
 
 	// Informacion del mapa
-	uint16_t* _mapInfo;
+	uint16_t* _mapInfo = nullptr;
 
 	// Nombre del mapa
-	char* _name;
+	char* _name = nullptr;
 
 	// Posicion y orientacion inicial del jugador
-	uint16_t* _playerStart;
+	uint16_t* _playerStart = nullptr;
 
 	// Libera la memoria
 	void free();
