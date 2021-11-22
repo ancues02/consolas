@@ -45,7 +45,6 @@ void InputListener::notify(SDL_Event* evt)
 InputInfo InputListener::getFrameInfo()
 {
 	InputInfo frameInfo = _inputInfo;
-	// TODO: esto deberia de resetearse pero va peor
 	resetInfo();
 	return frameInfo;
 }

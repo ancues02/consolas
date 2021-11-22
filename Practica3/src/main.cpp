@@ -9,6 +9,7 @@
 
 int main(int argc, char* argv[])
 {
+	
 	if (!Platform::Init() || !Renderer::Init(false, 1280, 720) || !Input::Init())
 		return -1;
 
@@ -24,10 +25,10 @@ int main(int argc, char* argv[])
 		game.draw();
 		Renderer::Present();
 	}
-	
+
 	Input::Release();
 	Renderer::Release();
 	Platform::Release();
-
+	
 	return 0;
 }

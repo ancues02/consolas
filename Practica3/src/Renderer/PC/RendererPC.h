@@ -28,6 +28,7 @@ private:
 	static SDL_Renderer* _renderer;
 	//P3
 	static Image** _textures;
+	static int _numImages;
 	//static 
 	
 };

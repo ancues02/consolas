@@ -54,7 +54,8 @@ FILE* Platform::OpenFile(const char *name, const char *flags)
 
 	if (it == _fileMap.end()) {
 		file = fopen(name, flags);
-		//TODO: Error handling
+		if (!file)
+			return nullptr;
 		_fileMap.insert({ name, file });
 	}
 	else {
@@ -70,6 +71,7 @@ void Platform::CloseFile(const char *name)
 	auto file_it = _fileMap.find(name);
 	if (file_it == _fileMap.end()) {
 		//ERRROR
+		std::cerr << "Error, no existe el mapa " << name << std::endl;
 	}
 	else {
 		_fileMap.erase(file_it);

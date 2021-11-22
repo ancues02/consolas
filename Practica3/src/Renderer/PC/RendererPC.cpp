@@ -11,7 +11,7 @@ int Renderer::_height = 720;
 SDL_Window* Renderer::_window = nullptr;
 SDL_Renderer* Renderer::_renderer = nullptr;
 
-// TODO: hacer el release de cada textura
+int Renderer::_numImages = 0;
 Image** Renderer::_textures = nullptr;
 
 bool Renderer::Init(bool fullscreen, int width, int height)
@@ -42,12 +42,19 @@ bool Renderer::Init(bool fullscreen, int width, int height)
 
 void Renderer::Release()
 {
+	for (int i = 0; i < _numImages; ++i) {
+		delete _textures[i];
+		_textures[i] = nullptr;
+	}
+	delete []_textures;
+
 	
 	SDL_DestroyRenderer(_renderer);
 	_renderer = nullptr;
 
 	SDL_DestroyWindow(_window);
 	_window = nullptr;
+
 }
 
 void Renderer::Clear(const Color& c)
@@ -135,14 +142,14 @@ bool Renderer::ReadImage(const char* name) {
 	FILE* file = Platform::OpenFile(name, "rb");
 
 	if (file == nullptr) return false; // Ha fallado la carga
-	int w, h, num;
-	if (fread(&num, 4, 1, file) == 0) return false;
+	int w, h;
+	if (fread(&_numImages, 4, 1, file) == 0) return false;
 	if (!bigEndian) 
-		num = FLIPENDIAN_32((int)num);
+		_numImages = FLIPENDIAN_32((int)_numImages);
 
-	_textures = new Image*[num];
+	_textures = new Image*[_numImages];
 
-	for (int x = 0; x < num && !feof(file); ++x) {
+	for (int x = 0; x < _numImages && !feof(file); ++x) {
 		if (fread(&w, 4, 1, file) == 0) break;
 		if (fread(&h, 4, 1, file) == 0) break;
 		if (!bigEndian) {
