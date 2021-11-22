@@ -178,6 +178,7 @@ int main(int argc, char* argv[])
 
 	
 	free();
+	Input::Release();
 	Renderer::Release();
 	Platform::Release();
 

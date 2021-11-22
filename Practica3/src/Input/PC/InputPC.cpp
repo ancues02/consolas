@@ -46,7 +46,6 @@ void Input::Tick()
 
 void Input::Release()
 {
-    delete _keyboard;
     if(_controller) SDL_GameControllerClose(_controller);
 }
 
