@@ -3,11 +3,16 @@
 #include "ImagePC.h"
 #include "SDL_render.h"
 
-Image::Image(SDL_Texture* surf) : imageb(surf) {
+Image::Image(SDL_Texture* surf) : _imageb(surf) {
+}
+
+Image::~Image()
+{
+	SDL_DestroyTexture(_imageb);
 }
 
 SDL_Texture* Image::getTexture() const {
-	return imageb;
+	return _imageb;
 }
 
 #endif

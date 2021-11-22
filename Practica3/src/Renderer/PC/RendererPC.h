@@ -29,6 +29,5 @@ private:
 	//P3
 	static Image** _textures;
 	static int _numImages;
-	//static 
 	
 };

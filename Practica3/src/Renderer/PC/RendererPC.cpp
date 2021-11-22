@@ -42,6 +42,7 @@ bool Renderer::Init(bool fullscreen, int width, int height)
 
 void Renderer::Release()
 {
+	
 	for (int i = 0; i < _numImages; ++i) {
 		delete _textures[i];
 		_textures[i] = nullptr;
@@ -143,7 +144,10 @@ bool Renderer::ReadImage(const char* name) {
 
 	if (file == nullptr) return false; // Ha fallado la carga
 	int w, h;
-	if (fread(&_numImages, 4, 1, file) == 0) return false;
+	if (fread(&_numImages, 4, 1, file) == 0) {
+		Platform::CloseFile(name);
+		return false;
+	}
 	if (!bigEndian) 
 		_numImages = FLIPENDIAN_32((int)_numImages);
 
@@ -173,9 +177,9 @@ bool Renderer::ReadImage(const char* name) {
 		*/
 		SDL_Surface* imageresult = SDL_CreateRGBSurfaceWithFormatFrom(imageb, w, h, 32, 4 * w, SDL_PIXELFORMAT_RGBA32);
 		_textures[x] = new Image(SDL_CreateTextureFromSurface(_renderer, imageresult));
-			//ERRATA 2 bytes en mapa y antes hay 16 bytes con el nombre del mapa terminado en \0
-			// si queremos ver las tripas del fichero cambiar a .bin y abrir con visual
+			
 	}
+	Platform::CloseFile(name);
 
 	return true;
 }

@@ -5,7 +5,8 @@
 class Image {
 public:
 	Image(SDL_Texture* surf);
+	~Image();
 	SDL_Texture* getTexture() const;
 private:
-	SDL_Texture* imageb;
+	SDL_Texture* _imageb;
 };

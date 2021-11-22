@@ -44,6 +44,7 @@ bool Platform::Tick()
 
 void Platform::Release()
 {
+
 	SDL_Quit();
 }
 

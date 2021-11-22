@@ -38,7 +38,10 @@ bool Game::loadMaps(const char* fileName)
 	if (file == nullptr) return false; // Ha fallado la carga
 
 	// Numero de mapas
-	if (fread(&numMaps, 2, 1, file) == 0) return false;
+	if (fread(&numMaps, 2, 1, file) == 0) {
+		Platform::CloseFile(fileName);
+		return false;
+	}
 	if (bigEndian)
 		numMaps = FLIPENDIAN_16((int)numMaps);
 
@@ -49,6 +52,8 @@ bool Game::loadMaps(const char* fileName)
 		loaded = maps[i].load(file, bigEndian);
 		i++;
 	}
+	Platform::CloseFile(fileName);
+
 	if (!loaded) return false;
 
 	return true;

@@ -18,8 +18,6 @@
 */
 class Map {
 public:
-	// Crea un mapa vacio con las caracteristicas que se proporcionan
-	Map(int width, int heigth, int nameSize);
 
 	// Crea un mapa vacio con las caracteristicas de la practica
 	Map();
