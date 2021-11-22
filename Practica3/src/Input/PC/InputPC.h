@@ -16,8 +16,7 @@ public:
 	static void Tick();
 	static void Release();
 
-	static float GetHorizontalAxis();
-	static float GetVerticalAxis();
+	static void GetAxis(float& horizontal, float& vertical);
 	static int GetZoom();
 
 private:
