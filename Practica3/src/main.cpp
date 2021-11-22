@@ -2,6 +2,10 @@
 #include "Platform/Platform.h"
 #include "Renderer/Renderer.h"
 #include "Logic/Game.h"
+#include "Input/Input.h"
+#include "Logic/Map.h"
+#include "Logic/Player.h"
+#include "Utils.h"
 
 int main(int argc, char* argv[])
 {
@@ -21,7 +25,8 @@ int main(int argc, char* argv[])
 		game.draw();
 		Renderer::Present();
 	}
-
+	
+	Input::Release();
 	Renderer::Release();
 	Platform::Release();
 
