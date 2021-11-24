@@ -130,6 +130,7 @@ void Game::drawMap(const Map& map) {
 	int centerX = Renderer::GetWidth() / 2, centerY = Renderer::GetHeight() / 2;
 	for (int j = 0; j < map.getSize(); ++j) {
 		if (map.getTile(j) <= 63 && map.getTile(j) > 0) {
+			//RenderThread.addCommand(PintaImagen,atributos....)
 			Renderer::DrawImage(*Renderer::GetImage(2 * map.getTile(j) - 2),
 				((j % TILE_SIZE) - playin->getPosX()) * finalTileSize + centerX,
 				((j / TILE_SIZE) - playin->getPosY()) * finalTileSize + centerY,
