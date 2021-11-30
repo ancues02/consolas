@@ -3,6 +3,8 @@
 class Map;
 
 struct RaycastData {
+	RaycastData(float x, float y, float d, bool v) : posX(x), posY(y), distance(d), vertical(v) {}
+
 	float posX, posY;
 	float distance;
 	bool vertical;
