@@ -3,6 +3,7 @@
 
 class Map;
 class Player;
+class Raycaster;
 
 class Game {
 public:
@@ -44,10 +45,14 @@ private:
 	// Jugador
 	Player* playin = nullptr;
 
+	// Raycaster
+	Raycaster* ray = nullptr;
+
 	// Escalado
 	float scale = 1.0f;
 
 	void drawMap(const Map&);
+	void drawRays();
 	void drawPlayer();
 
 	void free();

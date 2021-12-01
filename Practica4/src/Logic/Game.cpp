@@ -8,6 +8,7 @@
 
 #include "Map.h"
 #include "Player.h"
+#include "Raycaster.h"
 
 Game::Game()
 {
@@ -20,6 +21,7 @@ Game::~Game()
 
 void Game::draw() {
 	drawMap(maps[mapIndex]);
+	drawRays();
 	drawPlayer();
 }
 
@@ -27,6 +29,7 @@ bool Game::Init(const char* map, int index) {
 	if (!loadMaps(map)) return false;
 	playin = new Player(0, 0, 0);
 	if (!setMap(index)) return false;
+	ray = new Raycaster();
 	return true;
 }
 
@@ -80,6 +83,7 @@ void Game::setScaleLimits(float MinScale, float MaxScale)
 }
 
 void Game::update() {
+	
 	double deltaTime = Platform::getDeltaTime();
 
 	float posX, posY;
@@ -123,6 +127,8 @@ void Game::update() {
 		&& maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * -posY), tmpY)) {
 		playin->setPosY(realNextY);
 	}
+
+	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), DEG_RAD(90), maps[mapIndex]);
 }
 
 void Game::drawMap(const Map& map) {
@@ -136,6 +142,19 @@ void Game::drawMap(const Map& map) {
 				finalTileSize,
 				finalTileSize);
 		}
+	}
+}
+
+void Game::drawRays() {
+	RaycastData* rays = ray->getRays();
+	int finalTileSize = TILE_SIZE * scale;
+	int centerX = Renderer::GetWidth() / 2,
+		centerY = Renderer::GetHeight() / 2;
+	for (int i = 0; i < NUMBER_OF_RAYS; ++i) {
+		Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, 
+			(rays[i].posX - playin->getPosX()) * finalTileSize + centerX, 
+			(rays[i].posY - playin->getPosY()) * finalTileSize + centerY,
+			rays[i].vertical ? Color{ 255, 0, 255, 0 } : Color{ 255, 255, 0, 0 });
 	}
 }
 
@@ -157,4 +176,5 @@ void Game::drawPlayer()
 void Game::free() {
 	delete[] maps;
 	delete playin;
+	delete ray;
 }
