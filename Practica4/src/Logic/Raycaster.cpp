@@ -18,8 +18,8 @@ Raycaster::~Raycaster()
 void Raycaster::CastRays(float posX, float posY, float angleStart, float FOV, const Map& collisionData) {
 	float angle = angleStart - FOV / 2.0f;
 	float angIncr = FOV / (float)NUMBER_OF_RAYS;
-	for (int i = 0; i < NUMBER_OF_RAYS; ++i) {
-		CastRay(i, posX, posY, angleStart/*angle + i * angIncr*/, collisionData);
+	for (float i = 0; i < NUMBER_OF_RAYS; ++i) {
+		CastRay(i, posX, posY, angle + (i * angIncr), collisionData);
 	}
 }
 
@@ -87,6 +87,7 @@ void Raycaster::CastRay(int index, float posX, float posY, float angle, const Ma
         sideDistY = (mapY + 1.0 - posY) * deltaDistY;
     }
     //perform DDA
+   // bool vertical = false;
     while(collisionData.isTransitable(mapX, mapY))
     {
         //jump to next map square, either in x-direction, or in y-direction
@@ -104,11 +105,38 @@ void Raycaster::CastRay(int index, float posX, float posY, float angle, const Ma
         }
     }
 
+    
+    //Calculate distance projected on camera direction (Euclidean distance would give fisheye effect!)
+    if (side == 0) perpWallDist = (sideDistX - deltaDistX);
+    else          perpWallDist = (sideDistY - deltaDistY);
+
+    float h = 1080;
+    //Calculate height of line to draw on screen
+    int lineHeight = (int)(h / perpWallDist);
+
+    //calculate lowest and highest pixel to fill in current stripe
+    int drawStart = -lineHeight / 2 + h / 2;
+    if (drawStart < 0)drawStart = 0;
+    int drawEnd = lineHeight / 2 + h / 2;
+    if (drawEnd >= h)drawEnd = h - 1;
+
+    float cposY = mapY, cposX = mapX;
+    if (side == 1) {
+    	float catX = mapX - posX;
+    	float incrY = sqrt(pow(sideDistY, 2) - pow(catX, 2));
+    	cposY = posY + incrY;
+    }
+    else {
+    	float catY = mapY - posY;
+    	float incrX = sqrt(pow(sideDistX, 2) - pow(catY, 2));
+    	cposX = posX + incrX;
+    }
+
     _raydata[index].hit = collisionData.isTransitable(mapX, mapY);
-    _raydata[index].posX = mapX;
-    _raydata[index].posY = mapY;
-    _raydata[index].distance = 0;
-    _raydata[index].vertical = side > 1;
+    _raydata[index].posX = cposX;
+    _raydata[index].posY =  cposY;
+    _raydata[index].distance = perpWallDist;
+    _raydata[index].vertical = side == 1;
 }
 //
 //void Raycaster::CastRay(int index, float posX, float posY, float angle, const Map& collisionData)
