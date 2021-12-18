@@ -12,6 +12,7 @@ public:
 	float getAngle() const;
 	void setAngle(float angle);
 	void calculateAngle(float dX, float dY);
+	void rotate(float mod);
 
 	float getSpeed() const;
 
@@ -21,6 +22,7 @@ public:
 
 private:
 	const float PLAYERSPEED = 3; // tiles por segundo
+	const float PLAYER_ROTATE_SPEED = 3;
 	const unsigned int PLAYERSIZE = 5;
 	const unsigned int PLAYERBARSIZE = 25;
 

@@ -88,45 +88,29 @@ void Game::update() {
 
 	float posX, posY;
 	Input::GetAxis(posX, posY);
-	float zoom = Input::GetZoom();
 
-	if (zoom) {
-		scale += zoom * deltaTime * ZOOM_SPEED;
-		clampf(scale, minScale, maxScale);
+	playin->rotate(posX * deltaTime);
+
+	if (posY) {
+
+		float deltaSpeed = playin->getSpeed() * deltaTime;
+		float moveX = - posY * cos(playin->getAngle()) * deltaSpeed;
+		float moveY = - posY * sin(playin->getAngle()) * deltaSpeed;
+
+		int dirX = moveX > 0 ? 1 : ((moveX < 0) ? -1 : 0);
+		int dirY = moveY > 0 ? 1 : ((moveY < 0) ? -1 : 0);
+
+		if (maps[mapIndex].isTransitable(playin->getPosX(), playin->getPosY() + moveY + dirY * COLLISION_OFFSET) &&
+			maps[mapIndex].isTransitable(playin->getPosX() + COLLISION_OFFSET, playin->getPosY() + moveY + dirY * COLLISION_OFFSET) && 
+			maps[mapIndex].isTransitable(playin->getPosX() - COLLISION_OFFSET, playin->getPosY() + moveY + dirY * COLLISION_OFFSET))
+			playin->setPosY(playin->getPosY() + moveY);
+
+		if (maps[mapIndex].isTransitable(playin->getPosX() + moveX + dirX * COLLISION_OFFSET, playin->getPosY()) &&
+			maps[mapIndex].isTransitable(playin->getPosX() + moveX + dirX * COLLISION_OFFSET, playin->getPosY() + COLLISION_OFFSET) && 
+			maps[mapIndex].isTransitable(playin->getPosX() + moveX + dirX * COLLISION_OFFSET, playin->getPosY() - COLLISION_OFFSET))
+			playin->setPosX(playin->getPosX() + moveX);
 	}
-
-	if (!posX && !posY) return; //si no hay movimiento no calcular cosas
-
-	playin->calculateAngle(posX, posY);
-	float realNextX = playin->getPosX() + posX * playin->getSpeed() * deltaTime;
-	float realNextY = playin->getPosY() + posY * playin->getSpeed() * deltaTime;
-
-	//esto para comprobar el siguiente tile
-	// posX = roundAloAlto(posx) + roundAloBajo(posX)
-
-	if (posX > 0)posX = 1;
-	else if (posX < 0) posX = -1;
-	if (posY > 0)posY = 1;
-	else if (posY < 0) posY = -1;
-	float nextX = playin->getPosX() + posX * playin->getSpeed() * deltaTime;
-	float nextY = playin->getPosY() + posY * playin->getSpeed() * deltaTime;
-
-
-	//te mueves en horizontal solo si ni en tu actual Y, ni en la siguiente hacia arriba del tile
-	// ni en la de abajo del tile hay un tile
-	int tmpX = std::floorf(nextX + (COLLISION_OFFSET * posX));
-	if (maps[mapIndex].isTransitable(tmpX, playin->getPosY())
-		&& maps[mapIndex].isTransitable(tmpX, playin->getPosY() + (COLLISION_OFFSET * posX))
-		&& maps[mapIndex].isTransitable(tmpX, playin->getPosY() + (COLLISION_OFFSET * -posX))) {
-		playin->setPosX(realNextX);
-	}
-	//te mueves en vertical similar a horizontal pero comprobaciones en la x
-	int tmpY = std::floorf(nextY + (COLLISION_OFFSET * posY));
-	if (maps[mapIndex].isTransitable(playin->getPosX(), tmpY) &&
-		maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * posY), tmpY)
-		&& maps[mapIndex].isTransitable(playin->getPosX() + (COLLISION_OFFSET * -posY), tmpY)) {
-		playin->setPosY(realNextY);
-	}
+	
 
 	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), DEG_RAD(90), maps[mapIndex]);
 }
