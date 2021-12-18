@@ -51,6 +51,7 @@ private:
 	// Escalado
 	float scale = 1.0f;
 
+	void drawBack();
 	void drawMap(const Map&);
 	void drawRays();
 	void drawPlayer();
