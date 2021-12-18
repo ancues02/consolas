@@ -14,6 +14,7 @@ public:
 	static void DrawLine(int x1, int y1, int x2, int y2, const Color& c);
 	static void DrawCircle(int cx, int cy, int rad, const Color& c);
 	static void DrawImage(const Image& img, int x1, int y1, int x2, int y2);
+	static void DrawImageColumn(const Image& img, int c, int x1, int y1, int x2, int y2);
 	static void DrawRect(int x, int y, int w, int h, const Color& c);
 	static void Present();
 	static int GetWidth() { return _width; }
