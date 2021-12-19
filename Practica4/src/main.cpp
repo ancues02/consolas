@@ -5,6 +5,9 @@
 #include "Input/Input.h"
 #include "Renderer/RenderThread.h"
 
+#include <condition_variable>
+#include <mutex>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
@@ -27,17 +30,6 @@ int main(int argc, char* argv[])
 		Platform::Release();
 		return -1;
 	}
-
-
-	//while (Platform::Tick())
-	//{
-	//	Input::Tick();
-	//	game.update();
-	//	Renderer::Clear({ 255, 0, 0, 0 });//limpiamos a color negro por defecto
-	//	game.draw();
-	//	Renderer::Present();
-	//}
-	
 	
 	RenderThread::Start();
 
@@ -46,18 +38,15 @@ int main(int argc, char* argv[])
 
 	while (Platform::Tick())
 	{
-		while (RenderThread::getFrames() > 2) {
-			//std::this_thread::sleep_for(std::chrono::microseconds(1));
-			//continue;
+		if (RenderThread::getFrames() > RenderThread::maxEnculados) {
+			std::unique_lock<std::mutex> lock(RenderThread::_mutex);
+			RenderThread::_cv.wait(lock);
 		}
 		Input::Tick();
 		game.update();
 		game.draw();
-		//RenderThread::addCommand(&rCClearTop);
-		//RenderThread::addCommand(&rCClearBot);
-		//game.draw();
 		RenderThread::addCommand(rCPresent);
-
+		std::cout << 1.0f / (Platform::getDeltaTime() + 0.0000000001) << std::endl;
 	}
 	RenderThread::Stop();
 	Input::Release();

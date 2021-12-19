@@ -8,6 +8,8 @@
 #include "RenderCommand.h"
 #include <atomic>
 #include <thread>
+#include <condition_variable>
+#include <mutex>
 
 template <typename T>
 class ConcurrentQueue;
@@ -18,11 +20,16 @@ public:
 	static void Stop();
 	static void addCommand(RenderCommand command);
 	static unsigned int getFrames() { return _frames; }
+	static std::condition_variable _cv;
+	static std::mutex _mutex;
+	static const short maxEnculados;
 private:
 	static std::thread _renderThread;
 	static std::atomic<bool> _exit;
 	static std::atomic<unsigned int> _frames;
 	static ConcurrentQueue<RenderCommand> _q;
+
+
 	static void run();
 };
 

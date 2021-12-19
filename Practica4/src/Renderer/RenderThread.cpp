@@ -9,13 +9,14 @@ std::thread RenderThread::_renderThread;
 std::atomic<bool> RenderThread::_exit = false;
 std::atomic<unsigned int> RenderThread::_frames = 0;
 ConcurrentQueue<RenderCommand> RenderThread::_q;
-
+std::condition_variable RenderThread::_cv;
+std::mutex RenderThread::_mutex;
+const short RenderThread::maxEnculados = 2;
 
 void RenderThread::Start()
 {
 	//crea el hilo y llama a run desde el hilo
 	_renderThread = std::thread(run);
-
 }
 
 void RenderThread::Stop()
@@ -32,6 +33,7 @@ void RenderThread::addCommand(RenderCommand command)
 	_q.Enqueue(command);
 	if (command.tipo == RenderCommandType::PRESENT_FRAME) {
 		++_frames;
+		_cv.notify_one();
 	}
 }
 
@@ -42,8 +44,8 @@ void RenderThread::run()
 		_q.Dequeue(c);
 		
 		if (&c == nullptr) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			continue;
+			std::unique_lock<std::mutex> lock(_mutex);
+			RenderThread::_cv.wait(lock);
 		}
 		while (c.tipo != RenderCommandType::PRESENT_FRAME) {
 			switch (c.tipo)
@@ -63,9 +65,8 @@ void RenderThread::run()
 		}
 		if (c.tipo == RenderCommandType::PRESENT_FRAME) {
 			Renderer::Present();
-			--_frames;
+			if (--_frames < maxEnculados)
+				_cv.notify_one();
 		}
-
 	}
-
 }
