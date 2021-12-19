@@ -14,15 +14,15 @@
 
 class RenderThread {
 public:
-	void Start();
-	void Stop();
-	void addCommand(RenderCommand* command);
+	static void Start();
+	static void Stop();
+	static void addCommand(RenderCommand* command);
 private:
-	std::thread _renderThread;
-	std::atomic<bool> _exit;
-	std::atomic<unsigned int> _frames;
-	moodycamel::ReaderWriterQueue<RenderCommand*> _q;
-	void run();
+	static std::thread _renderThread;
+	static std::atomic<bool> _exit;
+	static std::atomic<unsigned int> _frames;
+	static moodycamel::ReaderWriterQueue<RenderCommand*> _q;
+	static void run();
 };
 
 //Renderer::Clear(uint32_t color);

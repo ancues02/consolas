@@ -8,6 +8,7 @@
 
 #include "Map.h"
 #include "Player.h"
+#include "../Renderer/RenderThread.h"
 
 Game::Game()
 {
@@ -20,7 +21,7 @@ Game::~Game()
 
 void Game::draw() {
 	drawMap(maps[mapIndex]);
-	drawPlayer();
+	//drawPlayer();
 }
 
 bool Game::Init(const char* map, int index) {
@@ -130,12 +131,19 @@ void Game::drawMap(const Map& map) {
 	int centerX = Renderer::GetWidth() / 2, centerY = Renderer::GetHeight() / 2;
 	for (int j = 0; j < map.getSize(); ++j) {
 		if (map.getTile(j) <= 63 && map.getTile(j) > 0) {
-			//RenderThread.addCommand(PintaImagen,atributos....)
-			Renderer::DrawImage(*Renderer::GetImage(2 * map.getTile(j) - 2),
+			RenderCommand rC;
+			rC.tipo = RenderCommandType::DRAW_IMAGE;
+			rC.drawImageInfo.im = Renderer::GetImage(2 * map.getTile(j) - 2);
+			rC.drawImageInfo.x1 = ((j % TILE_SIZE) - playin->getPosX()) * finalTileSize + centerX;
+			rC.drawImageInfo.y1 = ((j / TILE_SIZE) - playin->getPosY()) * finalTileSize + centerY;
+			rC.drawImageInfo.x2 = finalTileSize;
+			rC.drawImageInfo.y2 = finalTileSize;
+			RenderThread::addCommand(&rC);
+			/*Renderer::DrawImage(*Renderer::GetImage(2 * map.getTile(j) - 2),
 				((j % TILE_SIZE) - playin->getPosX()) * finalTileSize + centerX,
 				((j / TILE_SIZE) - playin->getPosY()) * finalTileSize + centerY,
 				finalTileSize,
-				finalTileSize);
+				finalTileSize);*/
 		}
 	}
 }
