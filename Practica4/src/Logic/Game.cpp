@@ -24,7 +24,7 @@ Game::~Game()
 
 void Game::draw() {
 	drawBack();
-	drawMap(maps[mapIndex]);
+	//drawMap(maps[mapIndex]);
 	//drawRays();
 	//drawPlayer();
 }
@@ -117,8 +117,29 @@ void Game::update() {
 }
 
 void Game::drawBack() {
-	Renderer::DrawRect(0, 0, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 0, 0, 0});
-	Renderer::DrawRect(0, Renderer::GetHeight() / 2, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 128, 128, 128});
+
+	RenderCommand rCClearTop;
+	rCClearTop.tipo = RenderCommandType::CLEAR_RECT;
+	rCClearTop.clearRectInfo.color = Color{ 255,150,150,150 };
+	rCClearTop.clearRectInfo.x1 = 0;
+	rCClearTop.clearRectInfo.y1 = 0;
+	rCClearTop.clearRectInfo.x2 = Renderer::GetWidth();
+	rCClearTop.clearRectInfo.y2 = Renderer::GetHeight() / 2;
+
+	RenderThread::addCommand(rCClearTop);
+
+	RenderCommand rCClearBot;
+	rCClearBot.tipo = RenderCommandType::CLEAR_RECT;
+	rCClearBot.clearRectInfo.color = Color{ 255,128,128,128 };
+	rCClearBot.clearRectInfo.x1 = 0;
+	rCClearBot.clearRectInfo.y1 = Renderer::GetHeight() / 2;
+	rCClearBot.clearRectInfo.x2 = Renderer::GetWidth();
+	rCClearBot.clearRectInfo.y2 = Renderer::GetHeight() / 2;
+
+	RenderThread::addCommand(rCClearBot);
+
+	//Renderer::DrawRect(0, 0, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 0, 0, 0});
+	//Renderer::DrawRect(0, Renderer::GetHeight() / 2, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 128, 128, 128});
 }
 
 void Game::drawMap(const Map& map) {
@@ -157,8 +178,18 @@ void Game::drawMap(const Map& map) {
 			texX = TILE_SIZE - texX - 1;
 
 		//Renderer::DrawLine(i, drawStart, i, drawEnd, data[i].vertical ? Color({ 255, 0, 255, 0 }) : Color({ 255, 255, 0, 0 }));
-		Renderer::DrawImageColumn(*Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side)),
-			texX, i, drawStart, 1, drawEnd - drawStart);
+		RenderCommand rC;
+		rC.tipo = RenderCommandType::DRAW_TEXTURE;
+		rC.drawTextureLineInfo.image = Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side));
+		rC.drawTextureLineInfo.texX = texX;
+		rC.drawTextureLineInfo.x1 = i;
+		rC.drawTextureLineInfo.y1 = drawStart;
+		rC.drawTextureLineInfo.x2 =1;
+		rC.drawTextureLineInfo.y2 = drawEnd - drawStart;
+
+
+		//Renderer::DrawImageColumn(*Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side)),
+		//	texX, i, drawStart, 1, drawEnd - drawStart);
 	}
 }
 

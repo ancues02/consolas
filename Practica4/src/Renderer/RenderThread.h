@@ -16,12 +16,12 @@ class RenderThread {
 public:
 	static void Start();
 	static void Stop();
-	static void addCommand(RenderCommand* command);
+	static void addCommand(RenderCommand command);
 private:
 	static std::thread _renderThread;
 	static std::atomic<bool> _exit;
 	static std::atomic<unsigned int> _frames;
-	static moodycamel::ReaderWriterQueue<RenderCommand*> _q;
+	static moodycamel::ReaderWriterQueue<RenderCommand> _q;
 	static void run();
 };
 

@@ -5,7 +5,6 @@
 #include <stdio.h> 
 #include <iostream>
 
-#include "raycaster_textured.h"
 
 Raycaster::Raycaster(int hp, int wp) : h(hp), w(wp)
 {

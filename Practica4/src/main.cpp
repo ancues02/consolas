@@ -4,6 +4,8 @@
 #include "Logic/Game.h"
 #include "Input/Input.h"
 #include "Renderer/RenderThread.h"
+#include "concurrent_queue.h"
+
 
 int main(int argc, char* argv[])
 {
@@ -37,22 +39,8 @@ int main(int argc, char* argv[])
 	//	Renderer::Present();
 	//}
 	
+	
 	RenderThread::Start();
-	RenderCommand rCClearTop;
-	rCClearTop.tipo = RenderCommandType::CLEAR_RECT;
-	rCClearTop.clearRectInfo.color = Color{ 255,0,0,0 };
-	rCClearTop.clearRectInfo.x1 = 0;
-	rCClearTop.clearRectInfo.y1 = 0;
-	rCClearTop.clearRectInfo.x2 = Renderer::GetWidth();
-	rCClearTop.clearRectInfo.y2 = Renderer::GetHeight() / 2;
-
-	RenderCommand rCClearBot;
-	rCClearBot.tipo = RenderCommandType::CLEAR_RECT;
-	rCClearBot.clearRectInfo.color = Color{ 255,128,128,128 };
-	rCClearBot.clearRectInfo.x1 = 0;
-	rCClearBot.clearRectInfo.y1 = Renderer::GetHeight() / 2;
-	rCClearBot.clearRectInfo.x2 = Renderer::GetWidth();
-	rCClearBot.clearRectInfo.y2 = Renderer::GetHeight() / 2;
 
 	RenderCommand rCPresent;
 	rCPresent.tipo = RenderCommandType::PRESENT_FRAME;
@@ -61,10 +49,11 @@ int main(int argc, char* argv[])
 	{
 		Input::Tick();
 		game.update();
-		RenderThread::addCommand(&rCClearTop);
-		RenderThread::addCommand(&rCClearBot);
 		game.draw();
-		RenderThread::addCommand(&rCPresent);
+		//RenderThread::addCommand(&rCClearTop);
+		//RenderThread::addCommand(&rCClearBot);
+		//game.draw();
+		RenderThread::addCommand(rCPresent);
 
 	}
 	RenderThread::Stop();

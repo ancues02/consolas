@@ -23,7 +23,8 @@ struct ClearRectInfo {
     int y2;
 };
 struct DrawTextureLineInfo {
-    uint32_t color;
+    Image* image;
+    int texX;
     int x1;
     int x2;
     int y1;
