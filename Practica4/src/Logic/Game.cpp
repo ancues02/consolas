@@ -24,7 +24,7 @@ Game::~Game()
 
 void Game::draw() {
 	drawBack();
-	//drawMap(maps[mapIndex]);
+	drawMap(maps[mapIndex]);
 	//drawRays();
 	//drawPlayer();
 }
@@ -187,6 +187,7 @@ void Game::drawMap(const Map& map) {
 		rC.drawTextureLineInfo.x2 =1;
 		rC.drawTextureLineInfo.y2 = drawEnd - drawStart;
 
+		RenderThread::addCommand(rC);
 
 		//Renderer::DrawImageColumn(*Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side)),
 		//	texX, i, drawStart, 1, drawEnd - drawStart);

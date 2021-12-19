@@ -8,20 +8,21 @@
 #include "RenderCommand.h"
 #include <atomic>
 #include <thread>
-#include "../atomicops.h"
-#include "../readerwriterqueue.h"
 
+template <typename T>
+class ConcurrentQueue;
 
 class RenderThread {
 public:
 	static void Start();
 	static void Stop();
 	static void addCommand(RenderCommand command);
+	static unsigned int getFrames() { return _frames; }
 private:
 	static std::thread _renderThread;
 	static std::atomic<bool> _exit;
 	static std::atomic<unsigned int> _frames;
-	static moodycamel::ReaderWriterQueue<RenderCommand> _q;
+	static ConcurrentQueue<RenderCommand> _q;
 	static void run();
 };
 

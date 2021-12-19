@@ -4,7 +4,6 @@
 #include "Logic/Game.h"
 #include "Input/Input.h"
 #include "Renderer/RenderThread.h"
-#include "concurrent_queue.h"
 
 
 int main(int argc, char* argv[])
@@ -47,6 +46,10 @@ int main(int argc, char* argv[])
 
 	while (Platform::Tick())
 	{
+		while (RenderThread::getFrames() > 2) {
+			//std::this_thread::sleep_for(std::chrono::microseconds(1));
+			//continue;
+		}
 		Input::Tick();
 		game.update();
 		game.draw();
