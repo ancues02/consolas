@@ -24,7 +24,7 @@ Game::~Game()
 
 void Game::draw() {
 	drawBack();
-	drawMap(maps[mapIndex]);
+	drawMap3D(maps[mapIndex]);
 	//drawRays();
 	//drawPlayer();
 }
@@ -142,7 +142,7 @@ void Game::drawBack() {
 	//Renderer::DrawRect(0, Renderer::GetHeight() / 2, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 128, 128, 128});
 }
 
-void Game::drawMap(const Map& map) {
+void Game::drawMap3D(const Map& map) {
 	int h = Renderer::GetHeight();
 	int w = Renderer::GetWidth();
 
@@ -191,6 +191,20 @@ void Game::drawMap(const Map& map) {
 
 		//Renderer::DrawImageColumn(*Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side)),
 		//	texX, i, drawStart, 1, drawEnd - drawStart);
+	}
+}
+
+void Game::drawMap(const Map& map) {
+	int finalTileSize = TILE_SIZE * scale;
+	int centerX = Renderer::GetWidth() / 2, centerY = Renderer::GetHeight() / 2;
+	for (int j = 0; j < map.getSize(); ++j) {
+		if (map.getTile(j) <= 63 && map.getTile(j) > 0) {
+			Renderer::DrawImage(*Renderer::GetImage(2 * map.getTile(j) - 2),
+				((j % TILE_SIZE) - playin->getPosX()) * finalTileSize + centerX,
+				((j / TILE_SIZE) - playin->getPosY()) * finalTileSize + centerY,
+				finalTileSize,
+				finalTileSize);
+		}
 	}
 }
 

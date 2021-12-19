@@ -52,11 +52,11 @@ void Input::Release()
 void Input::GetAxis(float& horizontal, float& vertical) {
     vertical = horizontal = 0;
 
-    vertical -= _keyboard[SDL_SCANCODE_W];
-    vertical += _keyboard[SDL_SCANCODE_S];
+    vertical -= std::min(_keyboard[SDL_SCANCODE_W] + _keyboard[SDL_SCANCODE_UP], 1);
+    vertical += std::min(_keyboard[SDL_SCANCODE_S] + _keyboard[SDL_SCANCODE_DOWN], 1);
 
-    horizontal -= _keyboard[SDL_GetScancodeFromKey(SDLK_a)];
-    horizontal += _keyboard[SDL_GetScancodeFromKey(SDLK_d)];
+    horizontal -= std::min(_keyboard[SDL_GetScancodeFromKey(SDLK_a)] + _keyboard[SDL_GetScancodeFromKey(SDLK_LEFT)], 1);
+    horizontal += std::min(_keyboard[SDL_GetScancodeFromKey(SDLK_d)] + _keyboard[SDL_GetScancodeFromKey(SDLK_RIGHT)], 1);
 
     float vCont = 0;
     if (_controller) {

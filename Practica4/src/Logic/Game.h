@@ -52,6 +52,7 @@ private:
 	float scale = 1.0f;
 
 	void drawBack();
+	void drawMap3D(const Map&);
 	void drawMap(const Map&);
 	void drawRays();
 	void drawPlayer();
