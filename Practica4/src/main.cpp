@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 
 	RenderCommand rCPresent;
 	rCPresent.tipo = RenderCommandType::PRESENT_FRAME;
-
+	int frameCount = 0;
+	float duration = 0;
 	while (Platform::Tick())
 	{
 		if (RenderThread::getFrames() > RenderThread::maxEnculados) {
@@ -46,7 +47,12 @@ int main(int argc, char* argv[])
 		game.update();
 		game.draw();
 		RenderThread::addCommand(rCPresent);
-		std::cout << 1.0f / (Platform::getDeltaTime() + 0.0000000001) << std::endl;
+		frameCount++;
+		duration += Platform::getDeltaTime();
+		if (duration > 5) {
+			std::cout << frameCount / duration << std::endl;
+			frameCount = duration = 0;
+		}
 	}
 	RenderThread::Stop();
 	Input::Release();
