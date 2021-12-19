@@ -17,6 +17,12 @@ void Player::setAngle(float angly) {
 
 void Player::calculateAngle(float dX, float dY) {
 	if (dX != 0 || dY != 0) angle = atan2(dY, dX);
+	if (angle < 0) angle += 2 * 3.1416;
+}
+
+void Player::rotate(float mod)
+{
+	angle += PLAYER_ROTATE_SPEED * mod;
 }
 
 float Player::getSpeed() const

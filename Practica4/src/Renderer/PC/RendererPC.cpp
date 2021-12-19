@@ -123,6 +123,15 @@ void Renderer::DrawImage(const Image &img, int x1, int y1, int x2, int y2) {
 	SDL_RenderCopy(_renderer, img.getTexture(), NULL, &r);
 }
 
+void Renderer::DrawImageColumn(const Image& img, int c, int x1, int y1, int x2, int y2) {
+	int w, h;
+	SDL_QueryTexture(img.getTexture(), NULL, NULL, &w, &h);	// Datos de la textura
+	if (c < 0 || c >= w) return; // fallo
+	SDL_Rect s = SDL_Rect{ c, 0, 1, h };
+	SDL_Rect r = SDL_Rect{ x1, y1, x2, y2 };
+	SDL_RenderCopy(_renderer, img.getTexture(), &s, &r);
+}
+
 void Renderer::DrawRect(int x, int y, int w, int h, const Color& c)
 {
 	SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
