@@ -18,24 +18,36 @@ class RenderThread {
 public:
 	static void Start();
 	static void Stop();
-	static void addCommand(const RenderCommand& command);
-	static unsigned int getFrames() { return _frames; }
+	static void AddCommand(const RenderCommand& command);
 	static void IncreaseFrames();
+
+	static unsigned short GetFrames();
+	static unsigned short GetMaxQueuedFrames();
+
+	static void WaitLock();
+	static void SignalLock();
+
+private:
+	// Hilo de render
+	static std::thread _renderThread;
+	
+	// Flag para salir del bucle de render
+	static std::atomic<bool> _exit;
+
+	// Nº de frames encolados
+	static std::atomic<unsigned short> _frames;
+	
+	// Cola concurrente Lock Free
+	static ConcurrentQueue<RenderCommand> _q;
+
+	// Variables para la comunicacion y sincronizacion de los threads de render y logica
 	static std::condition_variable _cv;
 	static std::mutex _mutex;
 	static std::unique_lock<std::mutex> _lock;
-	static const short maxQueue;
+	
+	// Maximo nº de frames encolados
+	static const unsigned short maxQueue;
 
-private:
-	static std::thread _renderThread;
-	static std::atomic<bool> _exit;
-	static std::atomic<unsigned int> _frames;
-	static ConcurrentQueue<RenderCommand> _q;
-
-
+	// Bucle de procesamiento de comandos de render
 	static void run();
 };
-
-//Renderer::Clear(uint32_t color);
-//Renderer::DrawImage(Image*, x1...);
-

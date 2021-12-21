@@ -30,7 +30,7 @@ void Raycaster::CastRays(const float& posX, const float& posY, const float& angl
         CastRay(x, posX, posY, angleStart, collisionData); 
 	}
 
-    RenderThread::addCommand(_rC);
+    RenderThread::AddCommand(_rC);
 }
 
 RaycastData* Raycaster::getRays() {
@@ -131,20 +131,12 @@ void Raycaster::CastRay(const int& x, const float& posX, const float& posY, cons
     int texX = int(wallX * _tileSize);
     if ((_raydata[x].side == 0 && _raydata[x].rayDirX < 0) || (_raydata[x].side == 1 && _raydata[x].rayDirY > 0))
         texX = _tileSize - texX - 1;
-    //Renderer::DrawLine(i, drawStart, i, drawEnd, data[i].vertical ? Color({ 255, 0, 255, 0 }) : Color({ 255, 255, 0, 0 }));
-   
+
+    // Informacion que se usa para  
     _rC.rayLinesInfo.rl[x].im = Renderer::GetImage(2 * collisionData.getTile(j) - (1 + _raydata[x].side));
     _rC.rayLinesInfo.rl[x].texX = texX;
     _rC.rayLinesInfo.rl[x].x1 = x;
     _rC.rayLinesInfo.rl[x].x2 = 1;
     _rC.rayLinesInfo.rl[x].y1 = drawStart;
     _rC.rayLinesInfo.rl[x].y2 = drawEnd - drawStart;
-
-    /*_rC->drawTextureLineInfo.image = Renderer::GetImage(2 * collisionData.getTile(j) - (1 + _raydata[x].side));
-    _rC->drawTextureLineInfo.texX = texX;
-    _rC->drawTextureLineInfo.x1 = x;
-    _rC->drawTextureLineInfo.y1 = drawStart;
-    _rC->drawTextureLineInfo.y2 = drawEnd - drawStart;
-
-    RenderThread::addCommand(*_rC);*/
 }

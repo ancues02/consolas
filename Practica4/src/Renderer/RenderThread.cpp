@@ -1,9 +1,8 @@
-#include "../concurrent_queue.h"
+#include "../Queue/concurrent_queue.h"
 
 #include "RenderThread.h"
 #include <cstdint>
 #include "../Renderer/Renderer.h"
-//#include "../Utils.h"
 #include <chrono>
 
 #ifdef PLATFORM_PS4
@@ -13,12 +12,14 @@
 
 std::thread RenderThread::_renderThread;
 std::atomic<bool> RenderThread::_exit;
-std::atomic<unsigned int> RenderThread::_frames;
+std::atomic<unsigned short> RenderThread::_frames;
 ConcurrentQueue<RenderCommand> RenderThread::_q;
+
 std::condition_variable RenderThread::_cv;
 std::mutex RenderThread::_mutex;
 std::unique_lock<std::mutex> RenderThread::_lock(_mutex);
-const short RenderThread::maxQueue = 2;
+
+const unsigned short RenderThread::maxQueue = 2;
 
 void RenderThread::Start()
 {
@@ -31,9 +32,15 @@ void RenderThread::Start()
 void RenderThread::Stop()
 {
 	_exit = true;
+
+	// Por si la therad estaba bloqueada
 	RenderCommand com;
+	com.tipo = RenderCommandType::PRESENT_FRAME;
 	_q.Enqueue(com);
-	//hacer el join del hilo
+	IncreaseFrames();
+	_cv.notify_one();
+
+	// Esperar a que termine el hilo
 	_renderThread.join();
 }
 
@@ -41,7 +48,16 @@ void RenderThread::IncreaseFrames() {
 	_frames++;
 }
 
-void RenderThread::addCommand(const RenderCommand& command)
+unsigned short RenderThread::GetFrames() {
+	return _frames;
+}
+
+unsigned short RenderThread::GetMaxQueuedFrames()
+{
+	return maxQueue;
+}
+
+void RenderThread::AddCommand(const RenderCommand& command)
 {
 	_q.Enqueue(command);
 }
@@ -52,12 +68,14 @@ void RenderThread::run()
 	scePthreadSetaffinity(scePthreadSelf(), 1 << 3);
 #endif
 	while (!_exit) {
+		// Esperamos si no hay comandos que procesar (logica mas lenta que render)
 		if (_q.size() <= 0) {
-			_cv.wait(_lock);
+			WaitLock();
 		}
 		RenderCommand c;		
 		_q.Dequeue(c);
 
+		// Procesar los comandos para renderizar un frame
 		while (c.tipo != RenderCommandType::PRESENT_FRAME) {
 			switch (c.tipo)
 			{
@@ -89,6 +107,7 @@ void RenderThread::run()
 						c.rayLinesInfo.rl[i].texX, c.rayLinesInfo.rl[i].x1, c.rayLinesInfo.rl[i].y1, c.rayLinesInfo.rl[i].x2, c.rayLinesInfo.rl[i].y2);
 				}
 
+				// Borramos la informacion del raycaster del comando
 				delete[] c.rayLinesInfo.rl;
 #ifdef PLATFORM_PS4
 				sceRazorCpuPopMarker();
@@ -97,14 +116,25 @@ void RenderThread::run()
 			default:
 				break;
 			}
-			_q.Dequeue(c);
-			
+			_q.Dequeue(c);			
 		}
+
+		// Hacer el flip cuando el frame este completo
+		// Notificamos a la logica de que hemos procesado el frame
 		if (c.tipo == RenderCommandType::PRESENT_FRAME) {
 			Renderer::Present();
-			//--_frames;
 			if (--_frames < maxQueue)
-				_cv.notify_one();
+				SignalLock();
 		}
 	}
+}
+
+void RenderThread::WaitLock()
+{
+	_cv.wait(_lock);
+}
+
+void RenderThread::SignalLock()
+{
+	_cv.notify_one();
 }

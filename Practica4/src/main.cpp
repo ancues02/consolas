@@ -51,13 +51,14 @@ int main(int argc, char* argv[])
 		Input::Tick();
 		game.update();
 		game.draw();
-		if (RenderThread::getFrames() > RenderThread::maxQueue) {
-			RenderThread::_cv.wait(RenderThread::_lock);
-		}
-		RenderThread::addCommand(rCPresent);
 
+		// Esperamos si hay demasiados frames encolados (logica mas rapida que render)
+		if (RenderThread::GetFrames() > RenderThread::GetMaxQueuedFrames()) {
+			RenderThread::WaitLock();
+		}
+		RenderThread::AddCommand(rCPresent);
 		RenderThread::IncreaseFrames();
-		RenderThread::_cv.notify_one();
+		RenderThread::SignalLock();
 		frameCount++;
 		duration += Platform::getDeltaTime();
 		if (duration > 5) {

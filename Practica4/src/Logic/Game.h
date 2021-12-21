@@ -24,6 +24,7 @@ public:
 	bool loadMaps(const char* fileName);
 	bool setMap(int indx);
 	void setScaleLimits(float MinScale, float MaxScale);
+
 	void update();
 	void draw();
 
@@ -52,15 +53,19 @@ private:
 	// Escalado
 	float scale = 1.0f;
 
-	// Comando para hacer el clear
+	// Comandos para hacer el clear
 	RenderCommand rCClearTop;
 	RenderCommand rCClearBot;
 
+	// Dibujado de la P4
 	void drawBack();
 	void drawMap3D(const Map&);
-	void drawMap(const Map&);
 	void drawRays();
+
+	// Dibujado de la P3
+	void drawMap(const Map&);
 	void drawPlayer();
 
+	// Libera el mapa, el jugadro y el raycaster
 	void free();
 };

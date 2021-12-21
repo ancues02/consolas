@@ -127,13 +127,33 @@ void Game::update() {
 	
 }
 
+/// <summary>
+/// Aniade dos rectangulos grises para el fondo
+/// </summary>
 void Game::drawBack() {
-	RenderThread::addCommand(rCClearTop);
-	RenderThread::addCommand(rCClearBot);
+	RenderThread::AddCommand(rCClearTop);
+	RenderThread::AddCommand(rCClearBot);
 }
 
+/// <summary>
+/// Le dice al RayCaster que lance sus rayos y encole comandos de dibujado segun su resultado
+/// </summary>
+/// <param name="map">Mapa que usa para detectar colisiones</param>
 void Game::drawMap3D(const Map& map) {
 	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), DEG_RAD(90), maps[mapIndex]);
+}
+
+void Game::drawRays() {
+	RaycastData* rays = ray->getRays();
+	int finalTileSize = TILE_SIZE * scale;
+	int centerX = Renderer::GetWidth() / 2,
+		centerY = Renderer::GetHeight() / 2;
+	for (int i = 0; i < Renderer::GetWidth(); ++i) {
+		Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, 
+			(rays[i].posX - playin->getPosX()) * finalTileSize + centerX, 
+			(rays[i].posY - playin->getPosY()) * finalTileSize + centerY,
+			rays[i].side ? Color{ 255, 0, 255, 0 } : Color{ 255, 255, 0, 0 });
+	}
 }
 
 void Game::drawMap(const Map& map) {
@@ -150,18 +170,6 @@ void Game::drawMap(const Map& map) {
 	}
 }
 
-void Game::drawRays() {
-	RaycastData* rays = ray->getRays();
-	int finalTileSize = TILE_SIZE * scale;
-	int centerX = Renderer::GetWidth() / 2,
-		centerY = Renderer::GetHeight() / 2;
-	for (int i = 0; i < Renderer::GetWidth(); ++i) {
-		Renderer::DrawLine(Renderer::GetWidth() / 2, Renderer::GetHeight() / 2, 
-			(rays[i].posX - playin->getPosX()) * finalTileSize + centerX, 
-			(rays[i].posY - playin->getPosY()) * finalTileSize + centerY,
-			rays[i].side ? Color{ 255, 0, 255, 0 } : Color{ 255, 255, 0, 0 });
-	}
-}
 
 void Game::drawPlayer()
 {
