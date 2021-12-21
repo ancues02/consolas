@@ -38,7 +38,7 @@ void RenderThread::Stop()
 	com.tipo = RenderCommandType::PRESENT_FRAME;
 	_q.Enqueue(com);
 	IncreaseFrames();
-	_cv.notify_one();
+	SignalLock();
 
 	// Esperar a que termine el hilo
 	_renderThread.join();
@@ -81,7 +81,7 @@ void RenderThread::run()
 			{
 			case(RenderCommandType::DRAW_RECT):
 #ifdef PLATFORM_PS4
-				sceRazorCpuPushMarker("SPLIT", SCE_RAZOR_CPU_COLOR_GREEN, 1);
+				sceRazorCpuPushMarker("DRAW_RECT", SCE_RAZOR_CPU_COLOR_GREEN, 1);
 #endif
 				Renderer::DrawRect(c.drawRectInfo.x1, c.drawRectInfo.y1, c.drawRectInfo.x2, c.drawRectInfo.y2, c.drawRectInfo.color);
 #ifdef PLATFORM_PS4
@@ -89,14 +89,10 @@ void RenderThread::run()
 #endif
 				break;
 			case(RenderCommandType::DRAW_TEXTURE):
-/*#ifdef PLATFORM_PS4
-				sceRazorCpuPushMarker("COLUMN", SCE_RAZOR_CPU_COLOR_BLUE, 2);
-#endif*/
+
 				Renderer::DrawImageColumn(*c.drawTextureLineInfo.image,
 					c.drawTextureLineInfo.texX, c.drawTextureLineInfo.x1, c.drawTextureLineInfo.y1, c.drawTextureLineInfo.x2, c.drawTextureLineInfo.y2);
-/*#ifdef PLATFORM_PS4
-				sceRazorCpuPopMarker();
-#endif*/
+
 				break;
 			case(RenderCommandType::RAY_LINES):
 #ifdef PLATFORM_PS4
@@ -122,7 +118,13 @@ void RenderThread::run()
 		// Hacer el flip cuando el frame este completo
 		// Notificamos a la logica de que hemos procesado el frame
 		if (c.tipo == RenderCommandType::PRESENT_FRAME) {
+#ifdef PLATFORM_PS4
+				sceRazorCpuPushMarker("PRESENT", SCE_RAZOR_CPU_COLOR_MAGENTA, 3);
+#endif
 			Renderer::Present();
+#ifdef PLATFORM_PS4
+				sceRazorCpuPopMarker();
+#endif
 			if (--_frames < maxQueue)
 				SignalLock();
 		}

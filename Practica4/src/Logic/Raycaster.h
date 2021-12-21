@@ -19,10 +19,10 @@ class Raycaster {
 public:
 	Raycaster(int h, int w, int tileSize);
 	~Raycaster();
-	void CastRays(const float& posX, const float& posY, const float& angleStart, const float& FOV, const Map& collisionData);
+	void CastRays(float posX, float posY, float angleStart, float FOV, const Map& collisionData);
 	RaycastData* getRays();
 private:
-	void CastRay(const int& x, const float& posX, const float& posY, const float& ang, const Map& collisionData);
+	void CastRay(int x, float posX, float posY, float ang, float FOV, const Map& collisionData);
 	RenderCommand _rC;
 	RaycastData* _raydata;
 	int _h, _w, _tileSize;

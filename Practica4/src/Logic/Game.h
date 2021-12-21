@@ -32,6 +32,7 @@ private:
 	// Constantes
 	const unsigned int TILE_SIZE = 64;
 	const float ZOOM_SPEED = 1;
+	const float FIELD_OF_VIEW = 90;	// En degrees!!
 
 	const float COLLISION_OFFSET = 0.2f;
 

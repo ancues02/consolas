@@ -22,12 +22,12 @@ Raycaster::~Raycaster()
 	delete[] _raydata;
 }
 
-void Raycaster::CastRays(const float& posX, const float& posY, const float& angleStart, const float& FOV, const Map& collisionData) {
+void Raycaster::CastRays(float posX, float posY, float angleStart, float FOV, const Map& collisionData) {
     _rC.rayLinesInfo.wRays = _w;
     _rC.rayLinesInfo.rl = new RayLines[_w];
 
 	for (int x= 0; x < _w; ++x) {
-        CastRay(x, posX, posY, angleStart, collisionData); 
+        CastRay(x, posX, posY, angleStart, FOV, collisionData); 
 	}
 
     RenderThread::AddCommand(_rC);
@@ -37,11 +37,13 @@ RaycastData* Raycaster::getRays() {
 	return _raydata;
 }
 
-void Raycaster::CastRay(const int& x, const float& posX, const float& posY, const float& ang, const Map& collisionData) {
+void Raycaster::CastRay(int x, float posX, float posY, float ang, float FOV, const Map& collisionData) {
     float dirX = cos(ang);
     float dirY = sin(ang);
 
-    float planeX = -dirY , planeY = dirX ; //the 2d raycaster version of camera plane
+    float fovFactor = tan(DEG_RAD(FOV) / 2);
+
+    float planeX = -dirY * fovFactor, planeY = dirX * fovFactor; //the 2d raycaster version of camera plane
 
     //calculate ray position and direction
     float cameraX = 2 * x / (float)_w - 1; //x-coordinate in camera space
@@ -114,7 +116,7 @@ void Raycaster::CastRay(const int& x, const float& posX, const float& posY, cons
     _raydata[x].posX = posX;
     _raydata[x].posY = posY;  
 
-    int lineHeight = (int)(_h / _raydata[x].distance * tan(M_PI*0.25f));
+    int lineHeight = (int)(_h / _raydata[x].distance) / fovFactor;
 
     //calculate lowest and highest pixel to fill in current stripe
     int drawStart = -lineHeight / 2 + _h / 2;

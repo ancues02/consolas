@@ -140,7 +140,7 @@ void Game::drawBack() {
 /// </summary>
 /// <param name="map">Mapa que usa para detectar colisiones</param>
 void Game::drawMap3D(const Map& map) {
-	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), DEG_RAD(90), maps[mapIndex]);
+	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), FIELD_OF_VIEW, maps[mapIndex]);
 }
 
 void Game::drawRays() {

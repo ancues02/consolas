@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
 	if (!Platform::Init())
 		return -1;
-	if (!Renderer::Init(false, 1280, 720)) {
+	if (!Renderer::Init(false, 1920, 1080)) {
 		Platform::Release();
 		return -1;
 	}
