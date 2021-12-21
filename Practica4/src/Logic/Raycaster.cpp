@@ -10,10 +10,9 @@
 Raycaster::Raycaster(int hp, int wp, int tileSize) : _h(hp), _w(wp), _tileSize(tileSize)
 {
 	_raydata = new RaycastData[_w];
-    _rayLines = new RayLines[_w];
-    _rC = new RenderCommand();
-    _rC->rayLinesInfo.rl = _rayLines;
-    _rC->tipo = RenderCommandType::RAY_LINES;
+    //_rayLines = new RayLines[_w];
+    
+    _rC.tipo = RenderCommandType::RAY_LINES;
     //_rC->drawTextureLineInfo.x2 = 1;
 
 }
@@ -24,11 +23,14 @@ Raycaster::~Raycaster()
 }
 
 void Raycaster::CastRays(const float& posX, const float& posY, const float& angleStart, const float& FOV, const Map& collisionData) {
-	
+    _rC.rayLinesInfo.wRays = _w;
+    _rC.rayLinesInfo.rl = new RayLines[_w];
+
 	for (int x= 0; x < _w; ++x) {
         CastRay(x, posX, posY, angleStart, collisionData); 
 	}
-    RenderThread::addCommand(*_rC);
+
+    RenderThread::addCommand(_rC);
 }
 
 RaycastData* Raycaster::getRays() {
@@ -131,12 +133,12 @@ void Raycaster::CastRay(const int& x, const float& posX, const float& posY, cons
         texX = _tileSize - texX - 1;
     //Renderer::DrawLine(i, drawStart, i, drawEnd, data[i].vertical ? Color({ 255, 0, 255, 0 }) : Color({ 255, 255, 0, 0 }));
    
-    _rayLines[x].im = Renderer::GetImage(2 * collisionData.getTile(j) - (1 + _raydata[x].side));
-    _rayLines[x].texX = texX;
-    _rayLines[x].x1 = x;
-    _rayLines[x].x2 = 1;
-    _rayLines[x].y1 = drawStart;
-    _rayLines[x].y2 = drawEnd - drawStart;
+    _rC.rayLinesInfo.rl[x].im = Renderer::GetImage(2 * collisionData.getTile(j) - (1 + _raydata[x].side));
+    _rC.rayLinesInfo.rl[x].texX = texX;
+    _rC.rayLinesInfo.rl[x].x1 = x;
+    _rC.rayLinesInfo.rl[x].x2 = 1;
+    _rC.rayLinesInfo.rl[x].y1 = drawStart;
+    _rC.rayLinesInfo.rl[x].y2 = drawEnd - drawStart;
 
     /*_rC->drawTextureLineInfo.image = Renderer::GetImage(2 * collisionData.getTile(j) - (1 + _raydata[x].side));
     _rC->drawTextureLineInfo.texX = texX;

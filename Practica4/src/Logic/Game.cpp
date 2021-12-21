@@ -13,10 +13,19 @@
 
 Game::Game()
 {
-	
-	rCClear.tipo = RenderCommandType::CLEAR_RECT;
-	rCClear.clearRectInfo.color1 = Color{ 255,56,56,56 };
-	rCClear.clearRectInfo.color2 = Color{ 255,112,112,112 };
+	rCClearTop.tipo = RenderCommandType::DRAW_RECT;
+	rCClearTop.drawRectInfo.color = Color{ 255,56,56,56 };
+	rCClearTop.drawRectInfo.x1 = 0;
+	rCClearTop.drawRectInfo.y1 = 0;
+	rCClearTop.drawRectInfo.x2 = Renderer::GetWidth();
+	rCClearTop.drawRectInfo.y2 = Renderer::GetHeight()/2;
+
+	rCClearBot.tipo = RenderCommandType::DRAW_RECT;
+	rCClearBot.drawRectInfo.color = Color{ 255,112,112,112 };
+	rCClearBot.drawRectInfo.x1 = 0;
+	rCClearBot.drawRectInfo.y1 = Renderer::GetHeight() / 2;
+	rCClearBot.drawRectInfo.x2 = Renderer::GetWidth();
+	rCClearBot.drawRectInfo.y2 = (Renderer::GetHeight() / 2 )-1;
 }
 
 Game::~Game()
@@ -119,7 +128,8 @@ void Game::update() {
 }
 
 void Game::drawBack() {
-	RenderThread::addCommand(rCClear);
+	RenderThread::addCommand(rCClearTop);
+	RenderThread::addCommand(rCClearBot);
 }
 
 void Game::drawMap3D(const Map& map) {

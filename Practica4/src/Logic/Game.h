@@ -53,7 +53,8 @@ private:
 	float scale = 1.0f;
 
 	// Comando para hacer el clear
-	RenderCommand rCClear;
+	RenderCommand rCClearTop;
+	RenderCommand rCClearBot;
 
 	void drawBack();
 	void drawMap3D(const Map&);

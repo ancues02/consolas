@@ -23,8 +23,7 @@ public:
 	RaycastData* getRays();
 private:
 	void CastRay(const int& x, const float& posX, const float& posY, const float& ang, const Map& collisionData);
-	RenderCommand* _rC;
+	RenderCommand _rC;
 	RaycastData* _raydata;
-	RayLines* _rayLines;
 	int _h, _w, _tileSize;
 };

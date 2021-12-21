@@ -61,11 +61,11 @@ void RenderThread::run()
 		while (c.tipo != RenderCommandType::PRESENT_FRAME) {
 			switch (c.tipo)
 			{
-			case(RenderCommandType::CLEAR_RECT):
+			case(RenderCommandType::DRAW_RECT):
 #ifdef PLATFORM_PS4
 				sceRazorCpuPushMarker("SPLIT", SCE_RAZOR_CPU_COLOR_GREEN, 1);
 #endif
-				Renderer::SplitClear(c.clearRectInfo.color1, c.clearRectInfo.color2);
+				Renderer::DrawRect(c.drawRectInfo.x1, c.drawRectInfo.y1, c.drawRectInfo.x2, c.drawRectInfo.y2, c.drawRectInfo.color);
 #ifdef PLATFORM_PS4
 				sceRazorCpuPopMarker();
 #endif
@@ -82,16 +82,17 @@ void RenderThread::run()
 				break;
 			case(RenderCommandType::RAY_LINES):
 #ifdef PLATFORM_PS4
-				sceRazorCpuPushMarker("COLUMN", SCE_RAZOR_CPU_COLOR_BLUE, 2);
+				sceRazorCpuPushMarker("RAYRENDERING", SCE_RAZOR_CPU_COLOR_BLUE, 2);
 #endif
-				for (int i = 0; i < Renderer::GetWidth(); i++) {
+				for (int i = 0; i < c.rayLinesInfo.wRays; i++) {
 					Renderer::DrawImageColumn(*c.rayLinesInfo.rl[i].im,
 						c.rayLinesInfo.rl[i].texX, c.rayLinesInfo.rl[i].x1, c.rayLinesInfo.rl[i].y1, c.rayLinesInfo.rl[i].x2, c.rayLinesInfo.rl[i].y2);
 				}
+
+				delete[] c.rayLinesInfo.rl;
 #ifdef PLATFORM_PS4
 				sceRazorCpuPopMarker();
 #endif
-
 				break;
 			default:
 				break;
