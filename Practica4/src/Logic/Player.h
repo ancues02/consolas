@@ -22,7 +22,7 @@ public:
 
 private:
 	const float PLAYERSPEED = 3; // tiles por segundo
-	const float PLAYER_ROTATE_SPEED = 3;
+	const float PLAYER_ROTATE_SPEED = 1.5;
 	const unsigned int PLAYERSIZE = 5;
 	const unsigned int PLAYERBARSIZE = 25;
 

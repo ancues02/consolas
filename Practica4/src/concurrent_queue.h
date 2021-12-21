@@ -9,7 +9,6 @@ class ConcreteReclaimer;
 
 template <typename T>
 class ConcurrentQueue {
-  static_assert(std::is_copy_constructible_v<T>, "T requires copy constructor");
   struct Node;
   struct RegularNode;
 
@@ -45,8 +44,6 @@ class ConcurrentQueue {
   };
 
   void Enqueue(T&& value) {
-    static_assert(std::is_constructible_v<T, T&&>,
-                  "T must be constructible with T&&");
     Emplace(std::forward<T>(value));
   }
 
@@ -149,8 +146,7 @@ void ConcurrentQueue<T>::AcquireSafeNodeAndNext(std::atomic<Node*>& atomic_node,
 template <typename T>
 template <typename... Args>
 void ConcurrentQueue<T>::Emplace(Args&&... args) {
-  static_assert(std::is_constructible_v<T, Args&&...>,
-                "T must be constructible with Args&&...");
+
   RegularNode* new_node = new RegularNode(std::forward<Args>(args)...);
   Node* tail;
   Node* next;

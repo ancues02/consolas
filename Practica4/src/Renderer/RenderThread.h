@@ -18,11 +18,14 @@ class RenderThread {
 public:
 	static void Start();
 	static void Stop();
-	static void addCommand(RenderCommand command);
+	static void addCommand(const RenderCommand& command);
 	static unsigned int getFrames() { return _frames; }
+	static void IncreaseFrames();
 	static std::condition_variable _cv;
 	static std::mutex _mutex;
-	static const short maxEnculados;
+	static std::unique_lock<std::mutex> _lock;
+	static const short maxQueue;
+
 private:
 	static std::thread _renderThread;
 	static std::atomic<bool> _exit;

@@ -10,6 +10,7 @@ public:
 	static bool Init(bool fullscreen, int width, int height);
 	static void Release();
 	static void Clear(const Color& c);
+	static void SplitClear(const Color& c1, const Color& c2);
 	static void PutPixel(int x, int y, const Color& c);
 	static void DrawLine(int x1, int y1, int x2, int y2, const Color& c);
 	static void DrawCircle(int cx, int cy, int rad, const Color& c);

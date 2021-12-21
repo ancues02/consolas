@@ -9,11 +9,20 @@
 #include <mutex>
 #include <iostream>
 
+#ifdef PLATFORM_PS4
+#include <razorcpu.h>
+#include <razorcpu_debug.h>
+#endif
+
 int main(int argc, char* argv[])
 {
+#ifdef PLATFORM_PS4
+	scePthreadSetaffinity(scePthreadSelf(), 1 << 5);
+#endif
+
 	if (!Platform::Init())
 		return -1;
-	if (!Renderer::Init(false, 1920, 1080)) {
+	if (!Renderer::Init(false, 1280, 720)) {
 		Platform::Release();
 		return -1;
 	}
@@ -39,20 +48,25 @@ int main(int argc, char* argv[])
 	float duration = 0;
 	while (Platform::Tick())
 	{
-		if (RenderThread::getFrames() > RenderThread::maxEnculados) {
-			std::unique_lock<std::mutex> lock(RenderThread::_mutex);
-			RenderThread::_cv.wait(lock);
-		}
 		Input::Tick();
 		game.update();
 		game.draw();
+		if (RenderThread::getFrames() > RenderThread::maxQueue) {
+			RenderThread::_cv.wait(RenderThread::_lock);
+		}
 		RenderThread::addCommand(rCPresent);
+
+		RenderThread::IncreaseFrames();
+		RenderThread::_cv.notify_one();
 		frameCount++;
 		duration += Platform::getDeltaTime();
 		if (duration > 5) {
 			std::cout << frameCount / duration << std::endl;
 			frameCount = duration = 0;
 		}
+#ifdef PLATFORM_PS4
+		sceRazorCpuSync();
+#endif
 	}
 	RenderThread::Stop();
 	Input::Release();

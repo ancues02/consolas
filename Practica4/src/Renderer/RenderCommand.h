@@ -3,12 +3,15 @@
 
 //TODO probar a quitar el include y poner class Image
 #include "../Renderer/Renderer.h"
+#include "../Utils.h"
+
 
 enum class RenderCommandType {
     CLEAR_RECT,
     DRAW_TEXTURE,
     DRAW_IMAGE,
     PRESENT_FRAME,
+    RAY_LINES
 };
 
 /// <summary>
@@ -16,12 +19,10 @@ enum class RenderCommandType {
 /// El primer color es la parte de arriba y el segundo de la parte de abajo
 /// </summary>
 struct ClearRectInfo {
-    Color color;
-    int x1;
-    int x2;
-    int y1;
-    int y2;
+    Color color1;
+    Color color2;
 };
+
 struct DrawTextureLineInfo {
     Image* image;
     int texX;
@@ -39,8 +40,17 @@ struct DrawImageInfo {
     int y2;
 };
 
-struct PresentInfo {
+struct RayLines {
+    Image* im;
+    int texX;
+    int x1;
+    int x2;
+    int y1;
+    int y2;
+};
 
+struct RayLinesInfo {
+    RayLines* rl;
 };
 
 struct RenderCommand {
@@ -50,7 +60,8 @@ struct RenderCommand {
         ClearRectInfo clearRectInfo;
         DrawTextureLineInfo drawTextureLineInfo;
         DrawImageInfo drawImageInfo;
-        PresentInfo presentInfo;
+        RayLinesInfo rayLinesInfo;
+       
         /*No se puede hacer asi, hay que poner punteros, lo que puede generar problemas al destruirlo, hay que tener cuidado.
         string str;                 string* str;
         vector<int> v;              vector<int>* v;

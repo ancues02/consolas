@@ -11,10 +11,12 @@
 #include "../Renderer/RenderThread.h"
 #include "Raycaster.h"
 
-#include <iostream>
-
 Game::Game()
 {
+	
+	rCClear.tipo = RenderCommandType::CLEAR_RECT;
+	rCClear.clearRectInfo.color1 = Color{ 255,56,56,56 };
+	rCClear.clearRectInfo.color2 = Color{ 255,112,112,112 };
 }
 
 Game::~Game()
@@ -33,7 +35,7 @@ bool Game::Init(const char* map, int index) {
 	if (!loadMaps(map)) return false;
 	playin = new Player(0, 0, 0);
 	if (!setMap(index)) return false;
-	ray = new Raycaster(Renderer::GetHeight(), Renderer::GetWidth());
+	ray = new Raycaster(Renderer::GetHeight(), Renderer::GetWidth(), TILE_SIZE);
 	return true;
 }
 
@@ -113,85 +115,15 @@ void Game::update() {
 			maps[mapIndex].isTransitable(playin->getPosX() + moveX + dirX * COLLISION_OFFSET, playin->getPosY() - COLLISION_OFFSET))
 			playin->setPosX(playin->getPosX() + moveX);
 	}
-	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), DEG_RAD(90), maps[mapIndex]);
+	
 }
 
 void Game::drawBack() {
-
-	RenderCommand rCClearTop;
-	rCClearTop.tipo = RenderCommandType::CLEAR_RECT;
-	rCClearTop.clearRectInfo.color = Color{ 255,150,150,150 };
-	rCClearTop.clearRectInfo.x1 = 0;
-	rCClearTop.clearRectInfo.y1 = 0;
-	rCClearTop.clearRectInfo.x2 = Renderer::GetWidth();
-	rCClearTop.clearRectInfo.y2 = Renderer::GetHeight() / 2;
-
-	RenderThread::addCommand(rCClearTop);
-
-	RenderCommand rCClearBot;
-	rCClearBot.tipo = RenderCommandType::CLEAR_RECT;
-	rCClearBot.clearRectInfo.color = Color{ 255,128,128,128 };
-	rCClearBot.clearRectInfo.x1 = 0;
-	rCClearBot.clearRectInfo.y1 = Renderer::GetHeight() / 2;
-	rCClearBot.clearRectInfo.x2 = Renderer::GetWidth();
-	rCClearBot.clearRectInfo.y2 = Renderer::GetHeight() / 2;
-
-	RenderThread::addCommand(rCClearBot);
-
-	//Renderer::DrawRect(0, 0, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 0, 0, 0});
-	//Renderer::DrawRect(0, Renderer::GetHeight() / 2, Renderer::GetWidth(), Renderer::GetHeight() / 2, Color{255, 128, 128, 128});
+	RenderThread::addCommand(rCClear);
 }
 
 void Game::drawMap3D(const Map& map) {
-	int h = Renderer::GetHeight();
-	int w = Renderer::GetWidth();
-
-	RaycastData* data = ray->getRays();
-	for (int i = 0; i < Renderer::GetWidth(); ++i) {
-		//Calculate height of line to draw on screen
-		int lineHeight = (int)(h / data[i].distance);
-
-		int pitch = 0;
-
-		//calculate lowest and highest pixel to fill in current stripe
-		int drawStart = -lineHeight / 2 + h / 2 + pitch;
-		int drawEnd = lineHeight / 2 + h / 2 + pitch;
-
-		int j = data[i].mapX + (data[i].mapY * map.getWidth());
-		if (data[i].mapX < 0 || data[i].mapY < 0) {
-			int x = 0;
-		}
-
-		//calculate value of wallX
-		float wallX; //where exactly the wall was hit
-		if (data[i].side == 0)
-			wallX = data[i].posY + data[i].distance * data[i].rayDirY;
-		else
-			wallX = data[i].posX + data[i].distance * data[i].rayDirX;		
-		wallX -= floor(wallX);
-
-		//x coordinate on the texture
-		int texX = int(wallX * double(TILE_SIZE));
-		if (data[i].side == 0 && data[i].rayDirX > 0)
-			texX = TILE_SIZE - texX - 1;
-		if (data[i].side == 1 && data[i].rayDirY < 0)
-			texX = TILE_SIZE - texX - 1;
-
-		//Renderer::DrawLine(i, drawStart, i, drawEnd, data[i].vertical ? Color({ 255, 0, 255, 0 }) : Color({ 255, 255, 0, 0 }));
-		RenderCommand rC;
-		rC.tipo = RenderCommandType::DRAW_TEXTURE;
-		rC.drawTextureLineInfo.image = Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side));
-		rC.drawTextureLineInfo.texX = texX;
-		rC.drawTextureLineInfo.x1 = i;
-		rC.drawTextureLineInfo.y1 = drawStart;
-		rC.drawTextureLineInfo.x2 =1;
-		rC.drawTextureLineInfo.y2 = drawEnd - drawStart;
-
-		RenderThread::addCommand(rC);
-
-		//Renderer::DrawImageColumn(*Renderer::GetImage(2 * map.getTile(j) - (1 + data[i].side)),
-		//	texX, i, drawStart, 1, drawEnd - drawStart);
-	}
+	ray->CastRays(playin->getPosX(), playin->getPosY(), playin->getAngle(), DEG_RAD(90), maps[mapIndex]);
 }
 
 void Game::drawMap(const Map& map) {

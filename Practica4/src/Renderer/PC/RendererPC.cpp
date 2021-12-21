@@ -64,6 +64,11 @@ void Renderer::Clear(const Color& c)
 	SDL_RenderClear(_renderer);
 }
 
+void Renderer::SplitClear(const Color& c1, const Color& c2)
+{
+	DrawRect(0, 0, GetWidth(), GetHeight() / 2, c1);
+	DrawRect(0, GetHeight() / 2, GetWidth(), GetHeight() / 2, c2);
+}
 void Renderer::PutPixel(int x, int y, const Color& c)
 {
 	SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);

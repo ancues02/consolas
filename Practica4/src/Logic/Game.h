@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "../Renderer/RenderCommand.h"
 
 class Map;
 class Player;
@@ -50,6 +51,9 @@ private:
 
 	// Escalado
 	float scale = 1.0f;
+
+	// Comando para hacer el clear
+	RenderCommand rCClear;
 
 	void drawBack();
 	void drawMap3D(const Map&);
