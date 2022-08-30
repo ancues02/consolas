@@ -5,10 +5,6 @@
 #include "../Renderer/Renderer.h"
 #include <chrono>
 
-#ifdef PLATFORM_PS4
-#include <razorcpu.h>
-#include <razorcpu_debug.h>
-#endif
 
 std::thread RenderThread::_renderThread;
 std::atomic<bool> RenderThread::_exit;
@@ -64,9 +60,7 @@ void RenderThread::AddCommand(const RenderCommand& command)
 
 void RenderThread::run()
 {
-#ifdef PLATFORM_PS4
-	scePthreadSetaffinity(scePthreadSelf(), 1 << 3);
-#endif
+
 	while (!_exit) {
 		// Esperamos si no hay comandos que procesar (logica mas lenta que render)
 		if (_q.size() <= 0) {
@@ -80,13 +74,9 @@ void RenderThread::run()
 			switch (c.tipo)
 			{
 			case(RenderCommandType::DRAW_RECT):
-#ifdef PLATFORM_PS4
-				sceRazorCpuPushMarker("DRAW_RECT", SCE_RAZOR_CPU_COLOR_GREEN, 1);
-#endif
+
 				Renderer::DrawRect(c.drawRectInfo.x1, c.drawRectInfo.y1, c.drawRectInfo.x2, c.drawRectInfo.y2, c.drawRectInfo.color);
-#ifdef PLATFORM_PS4
-				sceRazorCpuPopMarker();
-#endif
+
 				break;
 			case(RenderCommandType::DRAW_TEXTURE):
 
@@ -95,19 +85,14 @@ void RenderThread::run()
 
 				break;
 			case(RenderCommandType::RAY_LINES):
-#ifdef PLATFORM_PS4
-				sceRazorCpuPushMarker("RAYRENDERING", SCE_RAZOR_CPU_COLOR_BLUE, 2);
-#endif
-				for (int i = 0; i < c.rayLinesInfo.wRays; i++) {
+			for (int i = 0; i < c.rayLinesInfo.wRays; i++) {
 					Renderer::DrawImageColumn(*c.rayLinesInfo.rl[i].im,
 						c.rayLinesInfo.rl[i].texX, c.rayLinesInfo.rl[i].x1, c.rayLinesInfo.rl[i].y1, c.rayLinesInfo.rl[i].x2, c.rayLinesInfo.rl[i].y2);
 				}
 
 				// Borramos la informacion del raycaster del comando
 				delete[] c.rayLinesInfo.rl;
-#ifdef PLATFORM_PS4
-				sceRazorCpuPopMarker();
-#endif
+
 				break;
 			default:
 				break;
@@ -118,13 +103,9 @@ void RenderThread::run()
 		// Hacer el flip cuando el frame este completo
 		// Notificamos a la logica de que hemos procesado el frame
 		if (c.tipo == RenderCommandType::PRESENT_FRAME) {
-#ifdef PLATFORM_PS4
-				sceRazorCpuPushMarker("PRESENT", SCE_RAZOR_CPU_COLOR_MAGENTA, 3);
-#endif
+
 			Renderer::Present();
-#ifdef PLATFORM_PS4
-				sceRazorCpuPopMarker();
-#endif
+
 			if (--_frames < maxQueue)
 				SignalLock();
 		}
